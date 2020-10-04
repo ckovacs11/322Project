@@ -6,12 +6,12 @@ import java.sql.*;
 
 
 /* SER322 Fall 2020 Session A
- *   @Author: David Aldridge
+ *   @Author: David Aldridge, Curtis Kovacs, Christopher Lopez, David Lacombe
  *   @Version :1.000000000
  *
- * This project was to use the JDBC to communicate with a java server. The input arguments from the command line
- * Determined the correct mothod to use and will direct the user to the readme if they are using an known command.
- * The server connection is always closed in a finally block.
+ * This project was to use the JDBC to communicate with a SQL server that contains the Movie theater database. The input arguments from the command line
+ * take in the Server URL, username and password to access the server. Then the main method will create a command line user interface and that will be where
+ * the user makes the choices. The choices will call predetermined SQL queries from the database and allow the user to do a few things.
  */
 public class MovieTheater
 {
@@ -69,12 +69,12 @@ public class MovieTheater
             Integer selection = -1;
             String mainMen = "Hello,\n Please select from the following options: \n\n 1. Check available Movies.\n ";
             mainMen = mainMen + "2. Buy Ticket. \n 3. Check showtime for certain movie.\n 4. Check reward points. ";
-            mainMen = mainMen +  "5. Add movie.\n 6. Delete Movie. \n 7.Update Showtime of movie.";
-            while(selection > 0 && selection < 8)
+            mainMen = mainMen +  "5. Add movie.\n 6. Delete Movie. \n 7.Update Showtime of movie.\n 8. Get all Rewards user Names.\n";
+            while(selection > 0 && selection < 9)
             {
                 System.out.println(mainMen);
                 selection = input.nextInt();
-                if (selection < 0 || selection > 8)                
+                if (selection < 0 || selection > 9)                
                 {
                     System.out.println("Please make a valid selection from 1-7.\n Thank you.");
                 }
@@ -93,6 +93,7 @@ public class MovieTheater
                     case 2:
                     {
                         //Will be calling a second method to buy ticket. Which will pass connection, movie_title (as string), seat (as string), showtime (as string)?? maybe auditorium (as int) too?
+                        buyTicket(server);
                         break;
                     }
                     case 3:
@@ -154,6 +155,149 @@ public class MovieTheater
             }
         }
     }
+    private static void buyTicket(Connection server)
+    {
+        String userInput, movieChoice, showtimeChoice, seatChoice;
+        ResultSet results;
+        boolean validMovie = false, validTime = false, validSeat =false;
+        try
+        {              
+            //CALLS QUERY TO GET ALL VALID MOVIES AND PASS THEM AS RESULT SET.
+            //Results = getMoviesAsResultSet(Server);
+            
+            while (validMovie != true)
+            {  
+                System.out.println("Please enter the name of the movie you wish to buy a ticket for:\n (If you need to see available movies type \"Movies\".\n");
+                userInput = input.nextLine();
+                if (userInput.toLowerCase().equals("movies"))
+                {
+                    System.out.println("Current Movies:");
+                    while (results.next())
+                    {
+                        System.out.println(results.getString(1));
+                    }
+                    continue;
+                }
+                else
+                { 
+                    while (results.next())
+                    {
+                        if(results.getString(1).toLowerCase().equals(userInput.toLowerCase()))
+                        {
+                            validMovie = true;
+                            movieChoice=userInput;
+                            break;
+                        }
+                    }
+                    if (validMovie == false)
+                    {
+                        System.out.println("That was not a valid selection.\nPlease select from this list of movies.\n");
+                        while(results.next())
+                        {
+                            System.out.println(results.getString(1));
+                        }
+                        continue;
+                    }
+                }
+            }
+            //results = Query(server,movieChoice); //Gets the showtimes for the currently selected movie
+            while (validTime != true)  
+            {
+                System.out.printf("Which Showtime would you like to see %s? \n Please enter the time:(Example\"12:20\"\n For a list of times type \"Times\"\n",movieChoice);
+                userInput = input.nextLine();
+                if (userInputtoLowerCase().equals("times"))
+                {
+                    System.out.printf("Showtimes for %s:\n",movieChoice);
+                    while(results.next())
+                        {
+                            System.out.println(results.getString(1));
+                        }
+                    continue;
+                }
+                else
+                {
+                    while (results.next())
+                    {
+                        if(results.getString(1).equals(userInput))
+                        {
+                            validTime = true;
+                            showtimeChoice=userInput;
+                            break;
+                        }
+                    }
+                    if (validTime == false)
+                    {
+                        System.out.printf("That was not a valid selection.\nPlease select from the available showtimes for %s:\n",movieChoice);
+                        while(results.next())
+                        {
+                            System.out.println(results.getString(1));
+                        }
+                        continue;
+                    }
+                }
+            }
+            //results = Query(server,movieChoice,showtimeChoice); //Gets the seats for the currently selected movie and showtime that have a null userid attached?
+            while (validSeat != true)
+            {
+                System.out.printf("Which seat would you like to reserve for %s at %s? \n Please enter the seat number:\n For a list of available seats type \"Seats\"\n",movieChoice, showtimeChoice);
+                userInput = input.nextint();
+                if (userInputtoLowerCase().equals("seats"))
+                {
+                    System.out.printf("Available seats for %s at  %s:\n",movieChoice,  showtimeChoice);
+                    while(results.next())
+                        {
+                            System.out.println(results.getString(1));
+                        }
+                    continue;
+                }
+                else
+                {
+                    while (results.next())
+                    {
+                        if(results.getInt(1) == (userInput))
+                        {
+                            validTime = true;
+                            seatChoice = userInput;
+                            break;
+                        }
+                    }
+                    if (validTime == false)
+                    {
+                        System.out.printf("That was not a valid selection.\nPlease select from the available seats for %s at %s:\n",movieChoice, showtimeChoice);
+                        while(results.next())
+                        {
+                            System.out.println(results.getString(1));
+                        }
+                        continue;
+                    }
+                }
+            }
+
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see above error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see above error to help solve.");
+        }
+        finally 
+        {
+            try 
+            {                  
+                if (server != null)
+                {server.close();}
+            }
+            catch (SQLException se) 
+            {
+                se.printStackTrace();
+            }
+        }
+    }
+}
 
 /*
     private static void export(String arg, String arg1, String arg2, String arg3)

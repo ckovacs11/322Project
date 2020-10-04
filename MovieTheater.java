@@ -16,13 +16,14 @@ import java.sql.*;
 public class MovieTheater
 {
     private static Connection server;
-    private static Scanner input;
+    private static Scanner input = System.in;;
     public MovieTheater()
     {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         //Does a check based on the length of the args to determine if the server will connect before it attempts.
         if (args.length != 4)
         {
@@ -31,9 +32,11 @@ public class MovieTheater
         }
         else
         {
-            try {
+            try 
+            {
                 server = DriverManager.getConnection(args[0], args[1], args[2]);
                 System.out.println("Connected......");
+                mainMenu(server);
             }
             catch(SQLException sqlexc)
             {
@@ -45,9 +48,114 @@ public class MovieTheater
                 exc.printStackTrace();
                 System.out.println("An error occurred. Please see above error to help solve.");
             }
+            finally 
+            {
+                try 
+                {                  
+                    if (server != null)
+                    {server.close();}
+                }
+                catch (SQLException se) 
+                {
+                    se.printStackTrace();
+                }
+            }
+        }
+    }
+    private static void mainMenu(Connection server)
+    {
+        try
+        {
+            Integer selection = -1;
+            String mainMen = "Hello,\n Please select from the following options: \n\n 1. Check available Movies.\n ";
+            mainMen = mainMen + "2. Buy Ticket. \n 3. Check showtime for certain movie.\n 4. Check reward points. ";
+            mainMen = mainMen +  "5. Add movie.\n 6. Delete Movie. \n 7.Update Showtime of movie.";
+            while(selection > 0 && selection < 8)
+            {
+                System.out.println(mainMen);
+                selection = input.nextInt();
+                if (selection < 0 || selection > 8)                
+                {
+                    System.out.println("Please make a valid selection from 1-7.\n Thank you.");
+                }
+                else
+                {
+                    switch (selection)
+                    {
+                    case 1:
+                    {
+                        // Calls the method that will search the database for all movies and info about them.
+                        // Passes connection so the new method will be able to keep using it.
+                        checkAvailableMovie(server);
+                        break;
+                        // POSSIBLE TO SET SElection to -1 after complete or after switch?
+                    }
+                    case 2:
+                    {
+                        //Will be calling a second method to buy ticket. Which will pass connection, movie_title (as string), seat (as string), showtime (as string)?? maybe auditorium (as int) too?
+                        break;
+                    }
+                    case 3:
+                    {
+                        // Will show all showtimes of a user entered movie title. If error then message will display and allow user to enter again or give up.
+                        //Passes connection and movie_title as string.
+                        break;
+                    }
+                    case 4:
+                    {
+                        // Will pass connection user's_name(they enter a name? Should we have a method to get user names?), and birthday as string
+                        break;
+                    }
+                    case 5:
+                    {
+                        break;
+                    }
+                    case 6:
+                    {
+                        break;
+                    }
+                    case 7:
+                    {
+                        break;
+                    }
+                    default:
+                    {
+                        System.out.println("SOMETHING BAD HAPPENED TO GET HERE....");
+                        break;
+                    }
+
+                    }
+                }
+            }
+            
+
+            System.out.println(mainMen);
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see above error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see above error to help solve.");
+        }
+        finally 
+        {
+            try 
+            {                  
+                if (server != null)
+                {server.close();}
+            }
+            catch (SQLException se) 
+            {
+                se.printStackTrace();
+            }
         }
     }
 
+/*
     private static void export(String arg, String arg1, String arg2, String arg3)
     {
         ResultSet rs = null;

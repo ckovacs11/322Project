@@ -335,7 +335,7 @@ public class MovieTheater
             Date today = Date; //**********************CHECK THIS!!! Probably Wrong */
             while (validFunds != true)
             {
-                if (today = results.getString(3)
+                if (today = results.getString(3))
                 {
                     System.out.println("Happy Birthday!\nEnjoy your free movie on us!\nTell your friends!");                    
                 }
@@ -769,5 +769,3 @@ public class MovieTheater
 
 
 */
-
-}

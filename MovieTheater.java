@@ -89,11 +89,12 @@ public class MovieTheater
                     {
                         // Calls the method that will search the database for all movies and info about them.
                         // Passes connection so the new method will be able to keep using it.
-                        returned = checkAvailableMovie(server);
+                        Statement stmt = server.createStatement();
+                        ResultSet rs = stmt.executeQuery("SELECT title, rating, runtime, time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID");
                         System.out.println("Here are the currently showing movies:");
-                        while (returned.next())
+                        while (rs.next())
                         {
-                            System.out.println(returned.getString(1));
+                            System.out.println(rs.getInt(1) + " " + rs.getString(2) + " " + rs.getString(3) + " "+ rx.getString(4));
                         }
                         break;
                         // POSSIBLE TO SET SElection to -1 after complete or after switch?
@@ -193,6 +194,9 @@ public class MovieTheater
             
             while (validMovie != true)
             {  
+                Statement stmt = server.createStatement();
+                results = stmt.executeQuery("SELECT title FROM film");
+
                 System.out.println("Please enter the name of the movie you wish to buy a ticket for:\n (If you need to see available movies type \"Movies\".\n");
                 userInput = input.nextLine();
                 if (userInput.toLowerCase().equals("movies"))
@@ -221,6 +225,10 @@ public class MovieTheater
             //results = Query(server,movieChoice); //Gets the showtimes for the currently selected movie
             while (validTime != true)  
             {
+                PreparedStatement ps = server.prepareStatement("SELECT time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+                ps.setString(1, movieChoice);
+                results = ps.executeQuery();
+
                 System.out.printf("Which Showtime would you like to see %s? \n Please enter the time:(Example\"12:20\"\n For a list of times type \"Times\"\n",movieChoice);
                 userInput = input.nextLine();
                 if (userInputtoLowerCase().equals("times"))
@@ -255,8 +263,14 @@ public class MovieTheater
                 }
             }
             //results = Query(server,movieChoice,showtimeChoice); //Gets the seats for the currently selected movie and showtime that have a null userid attached?
+
             while (validSeat != true)
             {
+                PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE time =? AND title =? AND User_ID = null");
+                ps.setString(1, showtimeChoice);
+                ps.setString(2, movieChoice);
+                results = stmt.executeQuery("SELECT * FROM user");
+
                 System.out.printf("Which seat would you like to reserve for %s at %s? \n Please enter the seat number:\n For a list of available seats type \"Seats\"\n",movieChoice, showtimeChoice);
                 userInput = input.nextint();
                 if (userInputtoLowerCase().equals("seats"))
@@ -293,6 +307,8 @@ public class MovieTheater
             while(validUser !=true)
             {
                 //results = Query(server); //Gets all users in the database to confirm that they can buy a ticket.
+                Statement stmt = server.createStatement();
+                results = stmt.executeQuery("SELECT * FROM user");
 
                 System.out.printf("To purchase this ticket for %s at %s in seat:%s\nPlease enter your full name. \nNOTE: you must already be registered to purchase a ticket. If you need to check if you are registered then type \"Users\"");
                 userInput= input.nextLine();

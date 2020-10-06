@@ -15,32 +15,80 @@ public class Queries {
 
 
 
-
+    //returns the title, runtime, and rating for all movies
 	private ResultSet checkAvailableMovies(Server s){
+        try{
 		Statement stmt = s.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT title, rating, runtime, time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID");
+		ResultSet rs = stmt.executeQuery("SELECT Title, Rating, Runtime FROM film");
+
+        //close resources
+        if(stmt != null){
+            stmt.close();
+        }
+
+       }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when checking movies.");
+        }
 		return rs;
 	}
 
+    //returns all movie titles
 	private ResultSet getMovieTitles(Server s){
+        try{
 		Statement stmt = s.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT title FROM film");
+		ResultSet rs = stmt.executeQuery("SELECT Title FROM film");
+
+        //close resources
+        if(stmt != null){
+            stmt.close();
+        }
+
+
+       }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting movie titles.");
+        }
 		return rs;
 	}
 
+    //returns the showtimes for the given movie
 	private ResultSet getShowtimes(Server s, String name){
-		PreparedStatement ps = s.prepareStatement("SELECT time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+        try{
+		PreparedStatement ps = s.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
 		ps.setString(1, name);
 		ResultSet rs = ps.executeQuery();
+
+        //close resources
+        if(ps != null){
+            ps.close();
+        }
+
+       }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting showtimes.");
+        }
 		return rs;
 	}
 
+    //returns the seat IDs and Auditorium number
 	private ResultSet getSeats(Server s, String name, String time){
-		PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID
-		 WHERE time =? AND title =? AND User_ID = null");
+        try{
+		PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
 		 ps.setString(1, time);
 		 ps.setString(2, name);
 		 ResultSet rs = ps.executeQuery();
+
+         //close resources
+        if(ps != null){
+            ps.close();
+        }
+
+
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
 		 return rs;
 
 	}
@@ -52,6 +100,67 @@ public class Queries {
 	private ResultSet getUserInfo(Server s, String first, String last){
 
 	}
+
+    //returns 1 if the method successfully updates the Reward Points.
+    private int updatePoints(Server s, String first, String last, int points){
+        try{
+        PreparedStatement ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+        ps.setString(1, points);
+        ps.setString(2, first);
+        ps.setString(3, last);
+        int rowAffected = ps.executeUpdate();
+
+        //close resources
+        if(ps != null){
+            ps.close();
+        }
+       }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        }
+
+       
+        return rowAffected;
+
+    }
+
+    //returns 1 if the user's Reward Points have been successfully incremented
+    private int incrementPoints(Server s, String first, String last){
+
+        try{
+        PreparedStatement ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
+        ps.setString(1, first);
+        ps.setString(2, last);
+        ResultSet rs = ps.executeQuery();
+        int new_points;
+        while (rs.next())
+            {
+                new_points = rs.getInt(1) + 1;
+            }
+
+
+
+        PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+        ps2.setString(1, new_points);
+        ps2.setString(2, first);
+        ps2.setString(3, last);
+        int rowAffected = ps2.executeUpdate();
+
+        //close resources
+        if(ps != null){
+            ps.close();
+        }
+        if(ps2 != null){
+            ps2.close();
+        }
+
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when incrementing reward points.");
+        }
+        return rowAffected;
+
+    }
 
 
 

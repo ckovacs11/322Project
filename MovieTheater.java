@@ -400,7 +400,7 @@ public class MovieTheater
         ResultSet results;
         try
         {
-            results = queries.getMovieTitles(Server);
+            results = queries.getMovieTitles(server);
             while (results.next())
             {
                 if(results.getString(1).toLowerCase().equals(userInput.toLowerCase()))

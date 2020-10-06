@@ -89,8 +89,12 @@ public class MovieTheater
                     {
                         // Calls the method that will search the database for all movies and info about them.
                         // Passes connection so the new method will be able to keep using it.
+<<<<<<< HEAD
                         Statement stmt = server.createStatement();
                         ResultSet rs = stmt.executeQuery("SELECT title, rating, runtime, time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID");
+=======
+                        returned = checkAvailableMovies(server);
+>>>>>>> Add first Queries method
                         System.out.println("Here are the currently showing movies:");
                         while (rs.next())
                         {

@@ -18,7 +18,7 @@ public class Queries {
 
 	private ResultSet checkAvailableMovies(Server s){
 		Statement stmt = s.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT Title FROM film JOIN film_showtime ON film.Film_ID = film_showtime.Film_ID");
+		ResultSet rs = stmt.executeQuery("SELECT title, rating, runtime, time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID");
 		return rs;
 	}
 
@@ -86,12 +86,12 @@ public class Queries {
         }
     }
 
-    
+
 /*
     //The query1 method runs a query on the server that shows all customers id numbers, name and total spent.
       //It is the answer to part 1 of the assignment. And is a very simple query that the user has no adjustments to.
-     
-     
+
+
     private static void query1(String arg, String arg1, String arg2)
     {
         ResultSet rs = null;
@@ -147,7 +147,7 @@ public class Queries {
     }
      Takes in the args from the command line and it includes the dept no that is being searched for. Returns the dept name
      * name of customer and the total amount spent rounded so it is easier to use.
-     
+
     private static void query2(String arg, String arg1, String arg2, String arg3)
     {
         ResultSet rs = null;
@@ -371,7 +371,7 @@ public class Queries {
 
         xmlSerializer.serialize(_xmlDoc.getDocumentElement());
     }
-    
+
 
 
 */

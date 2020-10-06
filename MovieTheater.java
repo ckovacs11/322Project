@@ -17,13 +17,14 @@ import java.sql.Date;
 public class MovieTheater
 {
     private static Connection server;
-    private static Scanner input = System.in;;
+    private static Scanner input = System.in;
+
     public MovieTheater()
     {
 
     }
 
-    public static void main(String[] args) 
+    public static void main(String[] args)
     {
         //Does a check based on the length of the args to determine if the server will connect before it attempts.
         if (args.length != 4)
@@ -33,7 +34,7 @@ public class MovieTheater
         }
         else
         {
-            try 
+            try
             {
                 server = DriverManager.getConnection(args[0], args[1], args[2]);
                 System.out.println("Connected......");
@@ -49,14 +50,14 @@ public class MovieTheater
                 exc.printStackTrace();
                 System.out.println("An error occurred. Please see above error to help solve.");
             }
-            finally 
+            finally
             {
-                try 
-                {                  
+                try
+                {
                     if (server != null)
                     {server.close();}
                 }
-                catch (SQLException se) 
+                catch (SQLException se)
                 {
                     se.printStackTrace();
                 }
@@ -65,7 +66,9 @@ public class MovieTheater
     }
     private static void mainMenu(Connection server)
     {
-        ResultSet returned;
+        ResultSet rs;
+        Queries queries = new Queries();
+
         try
         {
             Integer selection = -1;
@@ -77,7 +80,7 @@ public class MovieTheater
             {
                 System.out.println(mainMen);
                 selection = input.nextInt();
-                if (selection < 1 || selection > 11)                
+                if (selection < 1 || selection > 11)
                 {
                     System.out.println("Please make a valid selection from 1-7.\n Thank you.");
                 }
@@ -89,12 +92,7 @@ public class MovieTheater
                     {
                         // Calls the method that will search the database for all movies and info about them.
                         // Passes connection so the new method will be able to keep using it.
-<<<<<<< HEAD
-                        Statement stmt = server.createStatement();
-                        ResultSet rs = stmt.executeQuery("SELECT title, rating, runtime, time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID");
-=======
-                        returned = checkAvailableMovies(server);
->>>>>>> Add first Queries method
+                        rs = queries.checkAvailableMovies(server);
                         System.out.println("Here are the currently showing movies:");
                         while (rs.next())
                         {
@@ -132,9 +130,9 @@ public class MovieTheater
                     }
                     case 7:
                     {
-                        //Update a showtime of a movie. 
+                        //Update a showtime of a movie.
                         break;
-                    }  
+                    }
                     case 8:
                     {
                         //Returns all users.
@@ -149,7 +147,7 @@ public class MovieTheater
                     {
                         //Deletes a user.
                         break;
-                    }                   
+                    }
                     default:
                     {
                         System.out.println("SOMETHING BAD HAPPENED TO GET HERE....");
@@ -159,7 +157,7 @@ public class MovieTheater
                     }
                 }
             }
-            
+
 
             System.out.println(mainMen);
         }
@@ -173,14 +171,14 @@ public class MovieTheater
             exc.printStackTrace();
             System.out.println("An error occurred. Please see above error to help solve.");
         }
-        finally 
+        finally
         {
-            try 
-            {                  
+            try
+            {
                 if (server != null)
                 {server.close();}
             }
-            catch (SQLException se) 
+            catch (SQLException se)
             {
                 se.printStackTrace();
             }
@@ -192,12 +190,12 @@ public class MovieTheater
         ResultSet results;
         boolean validMovie = false, validTime = false, validSeat =false, validUser = false, validFunds = false ;
         try
-        {              
+        {
             //CALLS QUERY TO GET ALL VALID MOVIES AND PASS THEM AS RESULT SET.
             //Results = getMoviesAsResultSet(Server);
-            
+
             while (validMovie != true)
-            {  
+            {
                 Statement stmt = server.createStatement();
                 results = stmt.executeQuery("SELECT title FROM film");
 
@@ -213,7 +211,7 @@ public class MovieTheater
                     continue;
                 }
                 else
-                { 
+                {
                     validMovie = checkMovie(server,userInput);
                     if (validMovie == false)
                     {
@@ -227,7 +225,7 @@ public class MovieTheater
                 }
             }
             //results = Query(server,movieChoice); //Gets the showtimes for the currently selected movie
-            while (validTime != true)  
+            while (validTime != true)
             {
                 PreparedStatement ps = server.prepareStatement("SELECT time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
                 ps.setString(1, movieChoice);
@@ -349,7 +347,7 @@ public class MovieTheater
                         continue;
                     }
                 }
-                
+
             }
             results = query(server,userFirst,userLast); //Return the funds, rewards points and birthday of user
             Date today = Date; //**********************CHECK THIS!!! Probably Wrong */
@@ -357,7 +355,7 @@ public class MovieTheater
             {
                 if (today = results.getString(3))
                 {
-                    System.out.println("Happy Birthday!\nEnjoy your free movie on us!\nTell your friends!");                    
+                    System.out.println("Happy Birthday!\nEnjoy your free movie on us!\nTell your friends!");
                 }
                 else if(results.getInt(1) > 9)
                 {
@@ -369,12 +367,12 @@ public class MovieTheater
                     System.out.printf("Purchasing 1 ticket for %s\nAt:%s\nSeat:%s\n",movieChoice,showtimeChoice,seatChoice);
                     //QUERY UPDATE USER FUNDS -10 (server,userFirst,userLast,newFunds amount)
                 }
-                else 
+                else
                 {
                     System.out.println("You do not have enough funds in your account.\n Please vist the ticket window or atm to add funds.\n Thank you.");
                     break;
                 }
-                
+
                 updateSeat(server,userFirst,userLast,movieChoice,showtimeChoice,seatChoice);
                 System.out.println("Enjoy your movie, and dont forget the popcorn!");
             }
@@ -391,14 +389,14 @@ public class MovieTheater
             System.out.println("An error occurred. Please see error to help solve.");
         }
         /* Since we have the try catch finally in the main method that calls this one, the finally would be called from there?
-        finally 
+        finally
         {
-            try 
-            {                  
+            try
+            {
                 if (server != null)
                 {server.close();}
             }
-            catch (SQLException se) 
+            catch (SQLException se)
             {
                 se.printStackTrace();
             }
@@ -432,14 +430,14 @@ public class MovieTheater
             System.out.println("An error occurred. Please see error to help solve.");
         }
         /*
-        finally 
+        finally
         {
-            try 
-            {                  
+            try
+            {
                 if (server != null)
                 {server.close();}
             }
-            catch (SQLException se) 
+            catch (SQLException se)
             {
                 se.printStackTrace();
             }
@@ -500,12 +498,12 @@ public class MovieTheater
         }
     }
 
-    
+
 /*
     //The query1 method runs a query on the server that shows all customers id numbers, name and total spent.
       //It is the answer to part 1 of the assignment. And is a very simple query that the user has no adjustments to.
-     
-     
+
+
     private static void query1(String arg, String arg1, String arg2)
     {
         ResultSet rs = null;
@@ -561,7 +559,7 @@ public class MovieTheater
     }
      Takes in the args from the command line and it includes the dept no that is being searched for. Returns the dept name
      * name of customer and the total amount spent rounded so it is easier to use.
-     
+
     private static void query2(String arg, String arg1, String arg2, String arg3)
     {
         ResultSet rs = null;
@@ -785,7 +783,7 @@ public class MovieTheater
 
         xmlSerializer.serialize(_xmlDoc.getDocumentElement());
     }
-    
+
 
 
 */

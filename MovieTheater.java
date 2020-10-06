@@ -18,6 +18,7 @@ public class MovieTheater
 {
     private static Connection server;
     private static Scanner input = System.in;
+    private static Queries queries;
 
     public MovieTheater()
     {
@@ -38,6 +39,7 @@ public class MovieTheater
             {
                 server = DriverManager.getConnection(args[0], args[1], args[2]);
                 System.out.println("Connected......");
+                queries = new Queries();
                 mainMenu(server);
             }
             catch(SQLException sqlexc)
@@ -67,7 +69,7 @@ public class MovieTheater
     private static void mainMenu(Connection server)
     {
         ResultSet rs;
-        Queries queries = new Queries();
+        
 
         try
         {
@@ -192,12 +194,10 @@ public class MovieTheater
         try
         {
             //CALLS QUERY TO GET ALL VALID MOVIES AND PASS THEM AS RESULT SET.
-            //Results = getMoviesAsResultSet(Server);
+            results = checkAvailableMovies(Server);
 
             while (validMovie != true)
             {
-                Statement stmt = server.createStatement();
-                results = stmt.executeQuery("SELECT title FROM film");
 
                 System.out.println("Please enter the name of the movie you wish to buy a ticket for:\n (If you need to see available movies type \"Movies\".\n");
                 userInput = input.nextLine();
@@ -224,18 +224,17 @@ public class MovieTheater
                     }
                 }
             }
-            //results = Query(server,movieChoice); //Gets the showtimes for the currently selected movie
+            results = queries.getShowtimes(server,movieChoice); //Gets the showtimes for the currently selected movie
             while (validTime != true)
             {
-                PreparedStatement ps = server.prepareStatement("SELECT time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
-                ps.setString(1, movieChoice);
-                results = ps.executeQuery();
+
 
                 System.out.printf("Which Showtime would you like to see %s? \n Please enter the time:(Example\"12:20\"\n For a list of times type \"Times\"\n",movieChoice);
                 userInput = input.nextLine();
                 if (userInputtoLowerCase().equals("times"))
                 {
                     System.out.printf("Showtimes for %s:\n",movieChoice);
+
                     while(results.next())
                         {
                             System.out.println(results.getString(1));
@@ -264,14 +263,10 @@ public class MovieTheater
                     }
                 }
             }
-            //results = Query(server,movieChoice,showtimeChoice); //Gets the seats for the currently selected movie and showtime that have a null userid attached?
+            results = queries.getSeats(server,movieChoice,showtimeChoice); //Gets the seats for the currently selected movie and showtime that have a null userid attached?
 
             while (validSeat != true)
             {
-                PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE time =? AND title =? AND User_ID = null");
-                ps.setString(1, showtimeChoice);
-                ps.setString(2, movieChoice);
-                results = stmt.executeQuery("SELECT * FROM user");
 
                 System.out.printf("Which seat would you like to reserve for %s at %s? \n Please enter the seat number:\n For a list of available seats type \"Seats\"\n",movieChoice, showtimeChoice);
                 userInput = input.nextint();
@@ -308,10 +303,7 @@ public class MovieTheater
             }
             while(validUser !=true)
             {
-                //results = Query(server); //Gets all users in the database to confirm that they can buy a ticket.
-                Statement stmt = server.createStatement();
-                results = stmt.executeQuery("SELECT * FROM user");
-
+                results = queries.getUsers(server); //Gets all users in the database to confirm that they can buy a ticket.
                 System.out.printf("To purchase this ticket for %s at %s in seat:%s\nPlease enter your full name. \nNOTE: you must already be registered to purchase a ticket. If you need to check if you are registered then type \"Users\"");
                 userInput= input.nextLine();
                 if(userInput.toLowerCase().equals("users"))
@@ -349,7 +341,7 @@ public class MovieTheater
                 }
 
             }
-            results = query(server,userFirst,userLast); //Return the funds, rewards points and birthday of user
+            results = queries.getUserInfo(server,userFirst,userLast); //Return the funds, rewards points and birthday of user
             Date today = Date; //**********************CHECK THIS!!! Probably Wrong */
             while (validFunds != true)
             {
@@ -408,7 +400,7 @@ public class MovieTheater
         ResultSet results;
         try
         {
-            //Results = getMoviesAsResultSet(Server);
+            results = queries.getMovieTitles(Server);
             while (results.next())
             {
                 if(results.getString(1).toLowerCase().equals(userInput.toLowerCase()))

@@ -22,6 +22,39 @@ public class Queries {
 		return rs;
 	}
 
+	private ResultSet getMovieTitles(Server s){
+		Statement stmt = s.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT title FROM film");
+		return rs;
+	}
+
+	private ResultSet getShowtimes(Server s, String name){
+		PreparedStatement ps = s.prepareStatement("SELECT time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+		ps.setString(1, name);
+		ResultSet rs = ps.executeQuery();
+		return rs;
+	}
+
+	private ResultSet getSeats(Server s, String name, String time){
+		PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID
+		 WHERE time =? AND title =? AND User_ID = null");
+		 ps.setString(1, time);
+		 ps.setString(2, name);
+		 ResultSet rs = ps.executeQuery();
+		 return rs;
+
+	}
+
+	private ResultSet getUsers(Server s){
+
+	}
+
+	private ResultSet getUserInfo(Server s, String first, String last){
+
+	}
+
+
+
 
 
 

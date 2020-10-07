@@ -370,6 +370,34 @@ public class Queries {
 
     }
 
+    //delete user based on name
+    private int deleteUser(Server s, String first, String last){
+
+        try{
+            PreparedStatement ps = s.prepareStatement("DELETE FROM user WHERE First_Name =? AND Last_Name =?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            int success = ps.executeUpdate();
+            if(success > 0){
+                System.out.println("MoUser successfully deleted");
+            } else{
+                System.out.println("User not deleted. Check SQL statement.");
+            }
+
+            // close resources
+            if (ps != null) {
+                ps.close();
+            }
+
+
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when deleting user.");
+        }
+        return success;
+
+    }
+
     }
 
 //*****************************************************************************************************************

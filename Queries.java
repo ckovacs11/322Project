@@ -13,6 +13,48 @@ import java.sql.*;
 
 public class Queries {
 
+    private int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
+        try{
+            PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+            ResultSet rs = pstmt.executeQuery();
+            int userID;
+            while(rs.next()){
+                userID = rs.getInt(1);
+            }
+
+            PreparedStatement ps = s.createStatement("UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
+            ps.setInt(1, userID);
+            ps.setString(2, title);
+            ps.setString(3, time);
+            ps.setString(4, seatNum);
+            int success = ps.executeUpdate();
+            if(success > 0){
+                System.out.println("Seat successfully reserved");
+            } else {
+                System.out.println("Error in reserving seat");
+            }
+
+            //close resources
+            if(rs != null){
+                rs.close();
+            }
+            if(pstmt!=null){
+                pstmt.close();
+            }
+            if(ps!=null){
+                ps.close();
+            }
+
+
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when checking movies.");
+        }
+        return success;
+    }
+
 
 
     //returns the title, runtime, and rating for all movies
@@ -418,6 +460,41 @@ public class Queries {
         }
         return success;
 
+    }
+
+    private int cancelTicket(Server s, String first, String last, String title){
+        try{
+            PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+            ResultSet rs = pstmt.executeQuery();
+            int userID;
+
+            PreparedStatement ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
+            ps.setInt(1, userID);
+            ps.setString(2, title);
+            int success = ps.executeUpdate();
+            if(success > 0){
+                System.out.println("Ticket successfully cancelled");
+            } else{
+                System.out.println("Ticket not cancelled. Check SQL statement.");
+            }
+
+            // close resources
+            if (pstmt != null) {
+                pstmt.close();
+            }
+            if (ps != null){
+                ps.close();
+            }
+            if (rs != null){
+                rs.close();
+            }
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when cancelling ticket.");
+        }
+        return success;
     }
 
     }

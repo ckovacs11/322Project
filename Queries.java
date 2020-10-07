@@ -28,34 +28,43 @@ public class Queries {
             ps.setInt(1, userID);
             ps.setString(2, title);
             ps.setString(3, time);
-            ps.setString(4, seatNum);
+            ps.setInt(4, seatNum);
             int success = ps.executeUpdate();
             if(success > 0){
                 System.out.println("Seat successfully reserved");
             } else {
                 System.out.println("Error in reserving seat");
             }
-
-            //close resources
-            if(rs != null){
-                rs.close();
-            }
-            if(pstmt!=null){
-                pstmt.close();
-            }
-            if(ps!=null){
-                ps.close();
-            }
-
-
         }catch(SQLException se){
             se.printStackTrace();
-            System.out.println("Error occurred when checking movies.");
+            System.out.println("Error occurred when updating Seat.");
+        }        
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating Seat.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(pstmt!=null){
+                    pstmt.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
     }
-
-
 
     //returns the title, runtime, and rating for all movies
 	private ResultSet checkAvailableMovies(Server s){
@@ -63,14 +72,30 @@ public class Queries {
 		Statement stmt = s.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT Title, Rating, Runtime FROM film");
 
-        //close resources
-        if(stmt != null){
-            stmt.close();
-        }
-
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when checking movies.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when checking movies.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
 		return rs;
 	}
@@ -79,17 +104,32 @@ public class Queries {
 	private ResultSet getMovieTitles(Server s){
         try{
 		Statement stmt = s.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT Title FROM film");
-
-        //close resources
-        if(stmt != null){
-            stmt.close();
-        }
-
-
+        ResultSet rs = stmt.executeQuery("SELECT Title FROM film");
+        
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting movie titles.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting movie titles.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
 		return rs;
 	}
@@ -101,14 +141,30 @@ public class Queries {
 		ps.setString(1, name);
 		ResultSet rs = ps.executeQuery();
 
-        //close resources
-        if(ps != null){
-            ps.close();
-        }
-
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting showtimes.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting showtimes.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
 		return rs;
 	}
@@ -121,15 +177,34 @@ public class Queries {
 		 ps.setString(2, name);
 		 ResultSet rs = ps.executeQuery();
 
-         //close resources
-        if(ps != null){
-            ps.close();
-        }
-
 
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting seats.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(pstmt!=null){
+                    pstmt.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
 		 return rs;
 
@@ -141,14 +216,30 @@ public class Queries {
             Statement stmt = s.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM user");
 
-            // close resources
-            if (stmt != null) {
-                stmt.close();
-            }
-
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when checking movies.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when checking movies.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rs;
 
@@ -160,14 +251,30 @@ public class Queries {
             Statement stmt = s.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT User_ID FROM user");
 
-            // close resources
-            if (stmt != null) {
-                stmt.close();
-            }
-
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting user Ids.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting user Ids.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rs;
     }
@@ -180,14 +287,30 @@ public class Queries {
             ps.setString(2, last);
             ResultSet rs = ps.executeQuery();
 
-            // close resources
-            if (ps != null) {
-                ps.close();
-            }
-
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting seats.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rs;
 	}
@@ -198,14 +321,30 @@ public class Queries {
             Statement stmt = s.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT Film_ID FROM film");
 
-            // close resources
-            if (stmt != null) {
-                stmt.close();
-            }
-
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting user Ids.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting user Ids.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(pstmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rs;
     }
@@ -217,17 +356,31 @@ public class Queries {
             ps.setString(1, first);
             ps.setString(2, last);
             ResultSet rs = ps.executeQuery();
-
-            //close resources
-            if(ps != null){
-            ps.close();
-            }
-
-
-            
+       
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting funds.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting funds.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rs;
     }
@@ -239,39 +392,66 @@ public class Queries {
             ps.setString(1, first);
             ps.setString(2, last);
             ResultSet rs = ps.executeQuery();
-
-            //close resources
-            if(ps != null){
-            ps.close();
-            }
-
-
-            
+ 
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting reward points.");
         }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting reward points.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
+        }
         return rs;
-    
+    }
 
     //returns 1 if the method successfully updates the Reward Points.
     private int updatePoints(Server s, String first, String last, int points){
         try{
         PreparedStatement ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
-        ps.setString(1, points);
+        ps.setInt(1, points);
         ps.setString(2, first);
         ps.setString(3, last);
         int rowAffected = ps.executeUpdate();
 
-        //close resources
-        if(ps != null){
-            ps.close();
-        }
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when updating reward points.");
         }
-
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        }
+        finally
+        {
+            try
+            {
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
+        }
        
         return rowAffected;
 
@@ -294,7 +474,7 @@ public class Queries {
 
 
         PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
-        ps2.setString(1, new_points);
+        ps2.setInt(1, new_points);
         ps2.setString(2, first);
         ps2.setString(3, last);
         int rowAffected = ps2.executeUpdate();
@@ -310,6 +490,30 @@ public class Queries {
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when incrementing reward points.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when incrementing reward points.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps2 != null){
+                    ps2.close();
+                }
+                if(ps != null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rowAffected;
 
@@ -336,17 +540,33 @@ public class Queries {
             ps2.setString(3, last);
             int rowAffected = ps2.executeUpdate();
 
-            // close resources
-            if (ps != null) {
-                ps.close();
-            }
-            if (ps2 != null) {
-                ps2.close();
-            }
-
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when subtracting funds.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when subtracting funds.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps2!=null){
+                    ps2.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return rowAffected;
 
@@ -365,15 +585,30 @@ public class Queries {
                 System.out.println("Movie not added. Check SQL statement.");
             }
 
-            // close resources
-            if (stmt != null) {
-                stmt.close();
-            }
-
-
         }catch(SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when inserting movie.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when inserting movie.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
     }
@@ -391,15 +626,30 @@ public class Queries {
                 System.out.println("User not added. Check SQL statement.");
             }
 
-            // close resources
-            if (stmt != null) {
-                stmt.close();
-            }
-
-
         }catch(SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when inserting user.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when inserting user.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
     }
@@ -420,15 +670,30 @@ public class Queries {
                 System.out.println("Movie not deleted. Check SQL statement.");
             }
 
-            // close resources
-            if (ps != null) {
-                ps.close();
-            }
-
-
         }catch(SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when deleting movie.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when deleting movie.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
 
@@ -448,15 +713,30 @@ public class Queries {
                 System.out.println("User not deleted. Check SQL statement.");
             }
 
-            // close resources
-            if (ps != null) {
-                ps.close();
-            }
-
-
         }catch(SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when deleting user.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when deleting user.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
 
@@ -480,19 +760,33 @@ public class Queries {
                 System.out.println("Ticket not cancelled. Check SQL statement.");
             }
 
-            // close resources
-            if (pstmt != null) {
-                pstmt.close();
-            }
-            if (ps != null){
-                ps.close();
-            }
-            if (rs != null){
-                rs.close();
-            }
         }catch(SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when cancelling ticket.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when cancelling ticket.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(pstmt!=null){
+                    pstmt.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
         }
         return success;
     }

@@ -93,6 +93,7 @@ public class Queries {
 
 	}
 
+    //get all users
 	private ResultSet getUsers(Server s){
         try {
             Statement stmt = s.createStatement();
@@ -111,6 +112,7 @@ public class Queries {
 
 	}
 
+    //get user ids
     private ResultSet getUserIds(Server s){
         try {
             Statement stmt = s.createStatement();
@@ -128,6 +130,7 @@ public class Queries {
         return rs;
     }
 
+    //get specific user info
 	private ResultSet getUserInfo(Server s, String first, String last){
         try {
             PreparedStatement ps = server.prepareStatement("SELECT * FROM user WHERE First_Name=? AND Last_Name=?");
@@ -147,6 +150,7 @@ public class Queries {
         return rs;
 	}
 
+    //get all film ids
     private ResultSet getFilmIds(Server s){
         try {
             Statement stmt = s.createStatement();
@@ -160,6 +164,28 @@ public class Queries {
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting user Ids.");
+        }
+        return rs;
+    }
+
+    //get user.Funds
+    private ResultSet getFunds(Server s, String first, String last){
+        try{
+            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            ResultSet rs = ps.executeQuery();
+
+            //close resources
+            if(ps != null){
+            ps.close();
+            }
+
+
+            
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting funds.");
         }
         return rs;
     }
@@ -225,29 +251,7 @@ public class Queries {
 
     }
 
-    private ResultSet getFunds(Server s, String first, String last){
-        try{
-            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
-            ps.setString(1, first);
-            ps.setString(2, last);
-            ResultSet rs = ps.executeQuery();
-
-            //close resources
-            if(ps != null){
-            ps.close();
-            }
-
-
-            
-        }catch(SQLException se){
-            se.printStackTrace();
-            System.out.println("Error occurred when getting funds.");
-        }
-        return rs;
-    }
-
-    
-
+    //subract funds due to ticket purchase
     private int subtractFunds(Server s, String first, String last) {
 
         try {
@@ -284,6 +288,7 @@ public class Queries {
 
     }
 
+    //insert film
     private int insertMovie(Server s, int id, String title, String rating, int runtime){
         try{
             String sql = "INSERT INTO film VALUES (" + Integer.toString(id) + ", " + title + ", " + rating + ", " + Integer.toString(runtime) + ")";
@@ -304,11 +309,12 @@ public class Queries {
 
         }catch(SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when suinserting movie.");
+            System.out.println("Error occurred when inserting movie.");
         }
         return success;
     }
 
+    //insert user
     private int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
         try{
             String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  + ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
@@ -334,11 +340,37 @@ public class Queries {
         return success;
     }
 
-    private 
-
-}
+     
 
 
+    //delete film based on name
+    private int deleteMovie(Server s, String title){
+
+        try{
+            PreparedStatement ps = s.prepareStatement("DELETE FROM film WHERE Title =?");
+            ps.setString(1, title);
+            int success = ps.executeUpdate();
+            if(success > 0){
+                System.out.println("Movie successfully deleted");
+            } else{
+                System.out.println("Movie not deleted. Check SQL statement.");
+            }
+
+            // close resources
+            if (ps != null) {
+                ps.close();
+            }
+
+
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when deleting movie.");
+        }
+        return success;
+
+    }
+
+    }
 
 //*****************************************************************************************************************
     // BELOW HERE IS REFERENCE CODE FROM ASSIGN 5

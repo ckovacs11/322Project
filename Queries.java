@@ -191,13 +191,44 @@ public class Queries {
 
     }
 
+    private int updateFunds(Server s, String first, String last) {
 
+        try {
+            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            ResultSet rs = ps.executeQuery();
+            int funds;
+            while (rs.next()) {
+                funds = rs.getInt(1) + 1;
+            }
 
+            if(funds - 5 < 1){
+                funds = 0;
+            } else {
+                funds = funds - 5;
+            }
+            PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
+            ps2.setInt(1, funds);
+            ps2.setString(2, first);
+            ps2.setString(3, last);
+            int rowAffected = ps2.executeUpdate();
 
+            // close resources
+            if (ps != null) {
+                ps.close();
+            }
+            if (ps2 != null) {
+                ps2.close();
+            }
 
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when incrementing reward points.");
+        }
+        return rowAffected;
 
-
-
+    }
 
 }
 

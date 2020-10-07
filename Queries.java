@@ -94,11 +94,40 @@ public class Queries {
 	}
 
 	private ResultSet getUsers(Server s){
+        try {
+            Statement stmt = s.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM user");
 
+            // close resources
+            if (stmt != null) {
+                stmt.close();
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when getting movie titles.");
+        }
+        return rs;
 	}
 
 	private ResultSet getUserInfo(Server s, String first, String last){
+                try{
+		PreparedStatement ps = server.prepareStatement("SELECT * FROM user WHERE First_Name =? AND Last_Name=?");
+		 ps.setString(1, first);
+		 ps.setString(2, last);
+		 ResultSet rs = ps.executeQuery();
 
+         //close resources
+        if(ps != null){
+            ps.close();
+        }
+
+
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
+		 return rs;
 	}
 
     //returns 1 if the method successfully updates the Reward Points.

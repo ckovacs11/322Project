@@ -113,6 +113,7 @@ public class MovieTheater
                     {
                         // Will show all showtimes of a user entered movie title. If error then message will display and allow user to enter again or give up.
                         //Passes connection and movie_title as string.
+                        checkMovie(server, movieChoice);
                         break;
                     }
                     case 4:

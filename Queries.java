@@ -14,11 +14,12 @@ import java.sql.*;
 public class Queries {
 
     private int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
+        ResultSet rs;
         try{
             PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
             pstmt.setString(1, first);
             pstmt.setString(2, last);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
             int userID;
             while(rs.next()){
                 userID = rs.getInt(1);
@@ -68,9 +69,11 @@ public class Queries {
 
     //returns the title, runtime, and rating for all movies
 	private ResultSet checkAvailableMovies(Server s){
+        Statement stmt;
+        ResultSet rs;
         try{
-		Statement stmt = s.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT Title, Rating, Runtime FROM film");
+		stmt = s.createStatement();
+		rs = stmt.executeQuery("SELECT Title, Rating, Runtime FROM film");
 
        }catch(SQLException se){
             se.printStackTrace();
@@ -102,9 +105,11 @@ public class Queries {
 
     //returns all movie titles
 	private ResultSet getMovieTitles(Server s){
+        Statement stmt;
+        ResultSet rs;
         try{
-		Statement stmt = s.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT Title FROM film");
+		stmt = s.createStatement();
+        rs = stmt.executeQuery("SELECT Title FROM film");
         
        }catch(SQLException se){
             se.printStackTrace();
@@ -136,10 +141,12 @@ public class Queries {
 
     //returns the showtimes for the given movie
 	private ResultSet getShowtimes(Server s, String name){
+        PreparedStatement ps;
+        ResultSet rs;
         try{
-		PreparedStatement ps = s.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+		ps = s.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
 		ps.setString(1, name);
-		ResultSet rs = ps.executeQuery();
+		rs = ps.executeQuery();
 
        }catch(SQLException se){
             se.printStackTrace();
@@ -170,13 +177,14 @@ public class Queries {
 	}
 
     //returns the seat IDs and Auditorium number
-	private ResultSet getSeats(Server s, String name, String time){
+	private ResultSet getSeats(Server server, String name, String time){
+        PreparedStatement ps;
+        ResultSet rs;
         try{
-		PreparedStatement ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
-		 ps.setString(1, time);
-		 ps.setString(2, name);
-		 ResultSet rs = ps.executeQuery();
-
+		ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
+		ps.setString(1, time);
+		ps.setString(2, name);
+		rs = ps.executeQuery();
 
         }catch(SQLException se){
             se.printStackTrace();
@@ -212,9 +220,11 @@ public class Queries {
 
     //get all users
 	private ResultSet getUsers(Server s){
+        Statement stmt;
+        ResultSet rs;
         try {
-            Statement stmt = s.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM user");
+            stmt = s.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM user");
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -247,9 +257,11 @@ public class Queries {
 
     //get user ids
     private ResultSet getUserIds(Server s){
+        Statement stmt;
+        ResultSet rs;
         try {
-            Statement stmt = s.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT User_ID FROM user");
+            stmt = s.createStatement();
+            rs = stmt.executeQuery("SELECT User_ID FROM user");
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -280,12 +292,14 @@ public class Queries {
     }
 
     //get specific user info
-	private ResultSet getUserInfo(Server s, String first, String last){
+	private ResultSet getUserInfo(Server server, String first, String last){
+        PreparedStatement ps;
+        ResultSet rs;
         try {
-            PreparedStatement ps = server.prepareStatement("SELECT * FROM user WHERE First_Name=? AND Last_Name=?");
+            ps = server.prepareStatement("SELECT * FROM user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -317,9 +331,11 @@ public class Queries {
 
     //get all film ids
     private ResultSet getFilmIds(Server s){
+        Statement stmt;
+        ResultSet rs;
         try {
-            Statement stmt = s.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT Film_ID FROM film");
+            stmt = s.createStatement();
+            rs = stmt.executeQuery("SELECT Film_ID FROM film");
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -351,11 +367,13 @@ public class Queries {
 
     //get user.Funds
     private ResultSet getFunds(Server s, String first, String last){
+        PreparedStatement ps;
+        ResultSet rs;
         try{
-            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+            ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
        
         }catch(SQLException se){
             se.printStackTrace();
@@ -387,11 +405,13 @@ public class Queries {
 
     //get user.Reward_Points
     private ResultSet getPoints(Server s, String first, String last){
+        PreparedStatement ps;
+        ResultSet rs;
         try{
-            PreparedStatement ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
+            ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
  
         }catch(SQLException se){
             se.printStackTrace();
@@ -423,8 +443,9 @@ public class Queries {
 
     //returns 1 if the method successfully updates the Reward Points.
     private int updatePoints(Server s, String first, String last, int points){
+        PreparedStatement ps;
         try{
-        PreparedStatement ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+        ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
         ps.setInt(1, points);
         ps.setString(2, first);
         ps.setString(3, last);
@@ -459,12 +480,14 @@ public class Queries {
 
     //returns 1 if the user's Reward Points have been successfully incremented
     private int incrementPoints(Server s, String first, String last){
+        PreparedStatement ps, ps2;
+        ResultSet rs;
 
         try{
-        PreparedStatement ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
+        ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
         ps.setString(1, first);
         ps.setString(2, last);
-        ResultSet rs = ps.executeQuery();
+        rs = ps.executeQuery();
         int new_points;
         while (rs.next())
             {
@@ -473,7 +496,7 @@ public class Queries {
 
 
 
-        PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+        ps2 = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
         ps2.setInt(1, new_points);
         ps2.setString(2, first);
         ps2.setString(3, last);
@@ -521,12 +544,14 @@ public class Queries {
 
     //subract funds due to ticket purchase
     private int subtractFunds(Server s, String first, String last) {
+        PreparedStatement ps, ps2;
+        ResultSet rs;
 
         try {
-            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+            ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             double funds;
             while (rs.next()) {
                 funds = rs.getDouble(1) - 5;
@@ -534,7 +559,7 @@ public class Queries {
 
 
 
-            PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
+            ps2 = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
             ps2.setDouble(1, funds);
             ps2.setString(2, first);
             ps2.setString(3, last);
@@ -574,10 +599,11 @@ public class Queries {
 
     //insert film
     private int insertMovie(Server s, int id, String title, String rating, int runtime){
+        Statement stmt;
         try{
             String sql = "INSERT INTO film VALUES (" + Integer.toString(id) + ", " + title + ", " + rating + ", " + Integer.toString(runtime) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
-            Statement stmt = s.createStatement();
+            stmt = s.createStatement();
             int success = stmt.executeUpdate(sql);
             if(success > 0){
                 System.out.println("Movie successfully added");
@@ -598,9 +624,6 @@ public class Queries {
         {
             try
             {
-                if(rs != null){
-                    rs.close();
-                }
                 if(stmt!=null){
                     stmt.close();
                 }
@@ -615,10 +638,11 @@ public class Queries {
 
     //insert user
     private int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
+        Statement stmt;
         try{
-            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  + ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
+            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
-            Statement stmt = s.createStatement();
+            stmt = s.createStatement();
             int success = stmt.executeUpdate(sql);
             if(success > 0){
                 System.out.println("User successfully added");
@@ -639,9 +663,6 @@ public class Queries {
         {
             try
             {
-                if(rs != null){
-                    rs.close();
-                }
                 if(stmt!=null){
                     stmt.close();
                 }
@@ -659,9 +680,10 @@ public class Queries {
 
     //delete film based on name
     private int deleteMovie(Server s, String title){
+        PreparedStatement ps;
 
         try{
-            PreparedStatement ps = s.prepareStatement("DELETE FROM film WHERE Title =?");
+            ps = s.prepareStatement("DELETE FROM film WHERE Title =?");
             ps.setString(1, title);
             int success = ps.executeUpdate();
             if(success > 0){
@@ -683,9 +705,6 @@ public class Queries {
         {
             try
             {
-                if(rs != null){
-                    rs.close();
-                }
                 if(ps!=null){
                     ps.close();
                 }
@@ -701,9 +720,9 @@ public class Queries {
 
     //delete user based on name
     private int deleteUser(Server s, String first, String last){
-
+        PreparedStatement ps;
         try{
-            PreparedStatement ps = s.prepareStatement("DELETE FROM user WHERE First_Name =? AND Last_Name =?");
+            ps = s.prepareStatement("DELETE FROM user WHERE First_Name =? AND Last_Name =?");
             ps.setString(1, first);
             ps.setString(2, last);
             int success = ps.executeUpdate();
@@ -726,9 +745,6 @@ public class Queries {
         {
             try
             {
-                if(rs != null){
-                    rs.close();
-                }
                 if(ps!=null){
                     ps.close();
                 }
@@ -743,14 +759,16 @@ public class Queries {
     }
 
     private int cancelTicket(Server s, String first, String last, String title){
+        PreparedStatement ps, pstmt;
+        ResultSet rs;
         try{
-            PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
             pstmt.setString(1, first);
             pstmt.setString(2, last);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
             int userID;
 
-            PreparedStatement ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
+            ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
             ps.setInt(1, userID);
             ps.setString(2, title);
             int success = ps.executeUpdate();

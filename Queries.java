@@ -147,6 +147,23 @@ public class Queries {
         return rs;
 	}
 
+    private ResultSet getFilmIds(Server s){
+        try {
+            Statement stmt = s.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT Film_ID FROM film");
+
+            // close resources
+            if (stmt != null) {
+                stmt.close();
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when getting user Ids.");
+        }
+        return rs;
+    }
+
     //returns 1 if the method successfully updates the Reward Points.
     private int updatePoints(Server s, String first, String last, int points){
         try{
@@ -316,6 +333,8 @@ public class Queries {
         }
         return success;
     }
+
+    private 
 
 }
 

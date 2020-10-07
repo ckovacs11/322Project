@@ -73,7 +73,7 @@ public class MovieTheater
             Integer selection = 0;
             String mainMen = "Hello,\n Please select from the following options: \n\n1. Check available Movies.\n";
             mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
-            mainMen = mainMen + "5. Add movie.\n6. Delete Movie. \n7.Update Showtime of movie.\n8. Get all Rewards user Names.\n";
+            mainMen = mainMen + "5. Add movie.\n6. Delete Movie. \n7.Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
             mainMen = mainMen + "9. Add user.\n10. Delete user.\n11. Exit.\n";
             while(selection != -1)
             {
@@ -101,26 +101,30 @@ public class MovieTheater
                     {
                         // Will show all showtimes of a user entered movie title. If error then message will display and allow user to enter again or give up.
                         //Passes connection and movie_title as string.
+                        getShowtime(server);
                         break;
                     }
                     case 4:
                     {
                         // Will pass connection user's_name(they enter a name? Should we have a method to get user names?)
+                        getRewards(server);
                         break;
                     }
                     case 5:
                     {
                         //Insert Movie into theater. Should it also add showtimes?
+                        addMovie(server);
                         break;
                     }
                     case 6:
-                        // Deletes a movie from theater. (Does it need to delete showtimes too?)
                     {
+                        // Deletes a movie from theater. (Does it need to delete showtimes too?)
+                        deleteMovie(server);
                         break;
                     }
                     case 7:
                     {
-                        //Update a showtime of a movie.
+                        //Cancel user ticket.
                         break;
                     }
                     case 8:
@@ -131,11 +135,13 @@ public class MovieTheater
                     case 9:
                     {
                         //Adds a user.
+                        addUser(server);
                         break;
                     }
                     case 10:
                     {
                         //Deletes a user.
+                        deleteUser(server);
                         break;
                     }
                     case 11:
@@ -177,6 +183,156 @@ public class MovieTheater
             }
         }
     }
+    // Adds a movie to the theater based on user input. Will validate that the movie is not already in the theatre before adding.
+    public static void addMovie(Connection server)
+    {
+        String userInput, movieName, movieRating;
+        Integer movieRuntime, movieId, userINTput;
+        boolean valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter the name of the movie you wish to add:");
+            userInput = input.nextLine();
+            if(!checkMovie(server, userInput)) // We want the movie to not be found.
+            {
+                valid = true;
+                movieName = userInput;
+                movieId = generateFilmId(server);
+            }
+            else
+            {
+                System.out.println(userInput + " is already in the theatre.\nIf you wish to return to main menu type \'Cancel\'\nHere is a list of current movies to remind you what is playing:");
+                printMovies(server);
+            }
+        }
+        valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter the Rating of " + movieName + ":");
+            userInput = input.nextLine();
+            if(userInput.equalsIgnoreCase("G") || userInput.equalsIgnoreCase("PG") || userInput.equalsIgnoreCase("PG-13") || userInput.equalsIgnoreCase("R") || userInput.equalsIgnoreCase("NC-17"))
+            {
+                valid = true;
+                movieRating = userInput;
+            }
+            else
+            {
+                System.out.println("That is not an accepted Rating. Please enter one of the following:\nG\nPG\nPG-13\nR\nNC-17");
+            }
+        }
+        valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter the Rating of " + movieName + ":");
+            userINTput = input.nextInt();
+            if (userINTput > 0)
+            {
+                valid = true;
+                movieRuntime = userINTput;
+            }
+            else
+            {
+                System.out.println(movieName + " can not have a negative or zero runtime. Please enter a number greater than zero.....");
+            }
+        }
+        queries.insertMovie(server,movieId,movieName,movieRating,movieRuntime);
+        System.out.println(movieName + " has been added to the theater's available movies.");
+    }
+    
+    // Deletes a movie from the theater based on user input. And it ensures that there is the minimum of 10 movies in the theatre at any one time.
+    public static void deleteMovie(Connection server)
+    {
+        String userInput;
+        boolean valid = false;
+
+        while (!valid)
+        {
+            System.out.println("Please enter the name of the movie you wish to delete:");
+            userInput = input.nextLine();
+            if(userInput.equalsIgnoreCase("cancel"))
+            {
+                System.out.println("Returning to the Main Menu...");
+                return;
+            }
+            if(checkMovie(server, userInput))
+            {
+                if(countMovies(server) > 10)
+                {
+                    valid = true;
+                }
+                else
+                {
+                    System.out.println("This theatre is under contract to maintain 10 movies at minimum. It is currently at 10 so we can not delete " + userInput);
+                    return;
+                }
+            }
+            else
+            {
+                System.out.println(userInput + " is not a valid selection. Please choose from the following:\n or type \'Cancel\' to return to the main menu.");
+                printMovies(server);
+            }
+        }
+        queries.deleteMovie(server, userInput);
+        System.out.println(userInput + " has been deleted.");
+    }
+
+
+    // Prints all showtimes for a user entered movie name.
+    public static void getShowtime(Connection server)
+    {
+        String userInput;
+        boolean valid = false;
+        while (!valid)
+        {
+            System.out.println("Please enter the name of the movie you wish to check the showtimes for:\n");   
+            userInput = input.nextLine();
+            if(checkMovie(server, userInput))
+            {
+                valid = true;
+            }
+            else
+            {
+                System.out.println(userInput + " is not a movie we are showing. Please chose from our current movies:");
+                printMovies(server);
+            }
+        }
+        printShowtimes(server, userInput);
+    }
+
+    /*
+    *Deletes a rewards user that the user inputs. Validates that it is an actual option before delete attempt.
+    */
+    public static void deleteUser(Connection server)
+    {
+        String userInput, userFirst, userLast;
+        boolean valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter the name of the Rewards user you wish to remove: Ex:\"Tom Tim\"\n");
+            userInput = input.nextLine();
+            if(userInput.equalsIgnoreCase("cancel"))
+            {
+                System.out.println("Returning to Main Menu");
+                return;
+            }
+            if(checkUser(server, userInput))
+            {
+                valid = true;
+            }
+            else
+            {
+                System.out.println("That user is not found. Please check this list of users to ensure spelling.");
+                printUsers(server);
+                System.out.println("If you no longer wish to delete a user, please type \'Cancel\'");
+            }
+        }
+        String[] splited = userInput.split("\\s+");
+        userFirst = splited[0];
+        userLast = splited[1];
+        queries.deleteUser(server,userFirst,userLast);
+        System.out.println(userInput + " has be deleted. Returning to Main Menu.");
+    }
+
     /*This method adds a user to the Rewards program. It will verify that the user is not already in the system.
     * the user will then be asked to add in information for the user.
     */
@@ -191,6 +347,7 @@ public class MovieTheater
             userInput = input.nextLine();         
             if (userInput.equalsIgnoreCase("cancel"))
             {
+                System.out.println("Returning to Main Menu....");
                 return; //exits the addUser method back to the main menu
             }  
             
@@ -253,6 +410,7 @@ public class MovieTheater
         }
         userId = generateId(server);
         queries.insertUser(userId,newUserFirst,newUserLast,birthday,userFunds,userRewards);
+        System.out.println("Successfully added "+ newUserFirst + " " + newUserLast);
     }
     /*
     *This method walks the user through the process of buying a ticket. It give the user options and if the user is lost it prints out the options so the user can enter the required
@@ -384,7 +542,7 @@ public class MovieTheater
                     break;
                 }
 
-                updateSeat(server,userFirst,userLast,movieChoice,showtimeChoice,seatChoice);
+                queries.updateSeat(server,userFirst,userLast,movieChoice,showtimeChoice,seatChoice);
                 System.out.println("Enjoy your movie, and dont forget the popcorn!");
             }
         }
@@ -1010,6 +1168,52 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+    }
+
+    public static int countMovies(Connection server)
+    {
+        Integer count = 0;
+        ResultSet results;
+        try
+        {
+            results = getAvailableMovies(server);
+            while (results.next())
+            {
+                count++;
+            }
+            return count;
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see error to help solve.");
+        }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
+
     }
 
 }

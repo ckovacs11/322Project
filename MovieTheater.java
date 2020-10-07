@@ -182,7 +182,77 @@ public class MovieTheater
     */
     public static void addUser(Conneciton server)
     {
-        Sys
+        String userInput, newUserFirst, newUserLast, birthday;
+        Integer userFunds, userRewards, userIntInput, userId;
+        Boolean valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter the First and Last name of the new user you wish to add:(Separted by a space)\n Ex: Tim Tom");
+            userInput = input.nextLine();         
+            if (userInput.equalsIgnoreCase("cancel"))
+            {
+                return; //exits the addUser method back to the main menu
+            }  
+            
+            if (!checkUser(server, userInput)) //return of false means the user was not found.
+            {
+                valid = true;
+                String[] splited = userInput.split("\\s+");
+                newUserFirst = splited[0];
+                newUserLast = splited[1];
+            }
+            else 
+            {
+                System.out.println(userInput + " is already in the system. Please enter a different name.\nTo cancel adding a new user type \'Cancel\'");
+            }
+        }
+        valid = false;
+        while(!valid)
+        {
+            System.out.println("Please enter " + newUserFirst + " " + newUserLast + "'s Birthday:\n Ex: \'2000-12-31\'");
+            userInput = input.nextLine();
+            if(userInput.substring(4,4).matches("-") && userInput.substring(7,7).matches("-"))
+            {
+                valid =true;
+                birthday = userInput;
+            }
+            else
+            {
+                System.out.println("There was an error with the date you entered, please be sure to follow the Year-Month-Day format. Include the \'-\' in the date.");
+            }            
+        }
+        valid = false;
+        while(!valid) 
+        {
+            System.out.println("Please enter the funds that " + newUserFirst + " " + newUserLast + " has:\n(Any positive whole number)\n");
+            userIntInput = input.nextInt();
+            if (userIntInput >= 0)
+            {
+                valid = true;
+                userFunds = userIntInput;
+            }
+            else
+            {
+                System.out.println(newUserFirst + " " + newUserLast + " can not be in debt...\nPlease enter a whole number that is 0 or greater.");
+            }
+        }
+        valid = false;
+        while(!valid) 
+        {
+            System.out.println("Please enter the rewards that " + newUserFirst + " " + newUserLast + " has:\n(Any positive whole number)\n");
+            userIntInput = input.nextInt();
+            if (userIntInput >= 0)
+            {
+                valid = true;
+                userRewards = userIntInput;
+            }
+            else
+            {
+                System.out.println(newUserFirst + " " + newUserLast + " can not have negative reward points...\nPlease enter a whole number that is 0 or greater.");
+            }
+        }
+        userId = generateId(server);
+        queries.insertUser(userId,newUserFirst,newUserLast,birthday,userFunds,userRewards);
     }
     /*
     *This method walks the user through the process of buying a ticket. It give the user options and if the user is lost it prints out the options so the user can enter the required
@@ -811,6 +881,135 @@ public class MovieTheater
                 exc.printStackTrace();
                 System.out.println("An error occurred. Please see error to help solve.");
             }
+    }
+
+    //Generates a random 5 didgit number for userID and checks that it is not already used. If it is then it will re-generate a new number and check again.
+    public static int generateUserId(Connection server)
+    {
+        ResultSet results;
+        Integer randId;
+        boolean valid = false, match = false;
+        try
+        {
+            while (!valid)
+            {
+                randId = 10000 + new Random().nextInt(90000); // 10000 ≤ n ≤ 99999
+                results = queries.getUserIds(server);
+                while (results.next())
+                {
+                    if (randId == results.getInt(1))
+                    {
+                        match = true;
+                        break;
+                    }
+                
+                    if (!match) // if the userId was not found
+                    {
+                        valid = true;
+                        break;
+                    }
+                    else
+                    {
+                        match = false; // Resets the match boolean and restarts the loop.
+                    }
+                }
+            }
+            return randId;
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see error to help solve.");
+        }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
+    }
+    //Generates a random 5 didgit number for filmID and checks that it is not already used. If it is then it will re-generate a new number and check again.
+    public static int generateFilmId(Connection server)
+    {
+        ResultSet results;
+        Integer randId;
+        boolean valid = false, match = false;
+        try
+        {
+            while (!valid)
+            {
+                randId = 10000 + new Random().nextInt(90000); // 10000 ≤ n ≤ 99999
+                results = queries.getFilmIds(server);
+                while (results.next())
+                {
+                    if (randId == results.getInt(1))
+                    {
+                        match = true;
+                        break;
+                    }
+                
+                    if (!match) // if the userId was not found
+                    {
+                        valid = true;
+                        break;
+                    }
+                    else
+                    {
+                        match = false; // Resets the match boolean and restarts the loop.
+                    }
+                }
+            }
+            return randId;
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see error to help solve.");
+        }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
     }
 
 }

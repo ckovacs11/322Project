@@ -111,6 +111,23 @@ public class Queries {
 
 	}
 
+    private ResultSet getUserIds(Server s){
+        try {
+            Statement stmt = s.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT User_ID FROM user");
+
+            // close resources
+            if (stmt != null) {
+                stmt.close();
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when getting user Ids.");
+        }
+        return rs;
+    }
+
 	private ResultSet getUserInfo(Server s, String first, String last){
         try {
             PreparedStatement ps = server.prepareStatement("SELECT * FROM user WHERE First_Name=? AND Last_Name=?");
@@ -191,25 +208,45 @@ public class Queries {
 
     }
 
-    private int updateFunds(Server s, String first, String last) {
+    private ResultSet getFunds(Server s, String first, String last){
+        try{
+            PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            ResultSet rs = ps.executeQuery();
+
+            //close resources
+            if(ps != null){
+            ps.close();
+            }
+
+
+            
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting funds.");
+        }
+        return rs;
+    }
+
+    
+
+    private int subtractFunds(Server s, String first, String last) {
 
         try {
             PreparedStatement ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
             ResultSet rs = ps.executeQuery();
-            int funds;
+            double funds;
             while (rs.next()) {
-                funds = rs.getInt(1) + 1;
+                funds = rs.getDouble(1) - 5;
             }
 
-            if(funds - 5 < 1){
-                funds = 0;
-            } else {
-                funds = funds - 5;
-            }
+
+
             PreparedStatement ps2 = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
-            ps2.setInt(1, funds);
+            ps2.setDouble(1, funds);
             ps2.setString(2, first);
             ps2.setString(3, last);
             int rowAffected = ps2.executeUpdate();
@@ -224,10 +261,60 @@ public class Queries {
 
         } catch (SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when incrementing reward points.");
+            System.out.println("Error occurred when subtracting funds.");
         }
         return rowAffected;
 
+    }
+
+    private int insertMovie(Server s, int id, String title, String rating, int runtime){
+        try{
+            String sql = "INSERT INTO film VALUES (" + Integer.toString(id) + ", " + title + ", " + rating + ", " + Integer.toString(runtime) + ")";
+            System.out.println("SQL statement to be inserted: " + sql);
+            Statement stmt = s.createStatement();
+            int success = stmt.executeUpdate(sql);
+            if(success > 0){
+                System.out.println("Movie successfully added");
+            } else{
+                System.out.println("Movie not added. Check SQL statement.");
+            }
+
+            // close resources
+            if (stmt != null) {
+                stmt.close();
+            }
+
+
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when suinserting movie.");
+        }
+        return success;
+    }
+
+    private int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
+        try{
+            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  + ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
+            System.out.println("SQL statement to be inserted: " + sql);
+            Statement stmt = s.createStatement();
+            int success = stmt.executeUpdate(sql);
+            if(success > 0){
+                System.out.println("User successfully added");
+            } else{
+                System.out.println("User not added. Check SQL statement.");
+            }
+
+            // close resources
+            if (stmt != null) {
+                stmt.close();
+            }
+
+
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when inserting user.");
+        }
+        return success;
     }
 
 }

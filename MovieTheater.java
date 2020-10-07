@@ -68,9 +68,6 @@ public class MovieTheater
     }
     private static void mainMenu(Connection server)
     {
-        ResultSet rs;
-        
-
         try
         {
             Integer selection = 0;
@@ -179,6 +176,13 @@ public class MovieTheater
                 se.printStackTrace();
             }
         }
+    }
+    /*This method adds a user to the Rewards program. It will verify that the user is not already in the system.
+    * the user will then be asked to add in information for the user.
+    */
+    public static void addUser(Conneciton server)
+    {
+        Sys
     }
     /*
     *This method walks the user through the process of buying a ticket. It give the user options and if the user is lost it prints out the options so the user can enter the required
@@ -300,8 +304,8 @@ public class MovieTheater
                 else if(results.getInt(1) > 9)
                 {
                     System.out.printf("Purchasing 1 ticket for %s%nAt:%s%nSeat:%s%n",movieChoice,showtimeChoice,seatChoice);
-                    //QUERY UPDATE USER FUNDS -10 (server,userFirst,userLast,newFunds_amount)
-                    //Query Update USER REWARDS +1 (server,userFirst,userLast, newRewards_amount)
+                    queries.updateFunds(server, userFirst, userLast); // removes funds from user to purchase ticket.
+                    queries.incrementPoints(server, userFirst, userLast); //Adds 1 reward point to the user for buying a ticket.
                     validFunds = true;
                 }
                 else
@@ -372,7 +376,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -492,7 +499,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -536,7 +546,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -600,7 +613,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -665,7 +681,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -757,7 +776,10 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
             }
             catch(SQLException sqlexc)
             {

@@ -190,6 +190,28 @@ public class Queries {
         return rs;
     }
 
+    //get user.Reward_Points
+    private ResultSet getPoints(Server s, String first, String last){
+        try{
+            PreparedStatement ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            ResultSet rs = ps.executeQuery();
+
+            //close resources
+            if(ps != null){
+            ps.close();
+            }
+
+
+            
+        }catch(SQLException se){
+            se.printStackTrace();
+            System.out.println("Error occurred when getting reward points.");
+        }
+        return rs;
+    
+
     //returns 1 if the method successfully updates the Reward Points.
     private int updatePoints(Server s, String first, String last, int points){
         try{

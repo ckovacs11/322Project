@@ -15,6 +15,7 @@ public class Queries {
 
     private int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
         ResultSet rs;
+        int success;
         try{
             PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
             pstmt.setString(1, first);
@@ -30,7 +31,7 @@ public class Queries {
             ps.setString(2, title);
             ps.setString(3, time);
             ps.setInt(4, seatNum);
-            int success = ps.executeUpdate();
+            success = ps.executeUpdate();
             if(success > 0){
                 System.out.println("Seat successfully reserved");
             } else {
@@ -444,12 +445,13 @@ public class Queries {
     //returns 1 if the method successfully updates the Reward Points.
     private int updatePoints(Server s, String first, String last, int points){
         PreparedStatement ps;
+        int rowAffected;
         try{
         ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
         ps.setInt(1, points);
         ps.setString(2, first);
         ps.setString(3, last);
-        int rowAffected = ps.executeUpdate();
+        rowAffected = ps.executeUpdate();
 
        }catch(SQLException se){
             se.printStackTrace();
@@ -482,7 +484,7 @@ public class Queries {
     private int incrementPoints(Server s, String first, String last){
         PreparedStatement ps, ps2;
         ResultSet rs;
-
+        int rowAffected;
         try{
         ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
         ps.setString(1, first);
@@ -500,7 +502,7 @@ public class Queries {
         ps2.setInt(1, new_points);
         ps2.setString(2, first);
         ps2.setString(3, last);
-        int rowAffected = ps2.executeUpdate();
+        rowAffected = ps2.executeUpdate();
 
         //close resources
         if(ps != null){
@@ -546,24 +548,22 @@ public class Queries {
     private int subtractFunds(Server s, String first, String last) {
         PreparedStatement ps, ps2;
         ResultSet rs;
-
+        int rowAffected;
+        double funds;
         try {
             ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
             ps.setString(1, first);
             ps.setString(2, last);
-            rs = ps.executeQuery();
-            double funds;
+            rs = ps.executeQuery();            
             while (rs.next()) {
                 funds = rs.getDouble(1) - 5;
             }
-
-
 
             ps2 = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
             ps2.setDouble(1, funds);
             ps2.setString(2, first);
             ps2.setString(3, last);
-            int rowAffected = ps2.executeUpdate();
+            rowAffected = ps2.executeUpdate();
 
         } catch (SQLException se) {
             se.printStackTrace();
@@ -600,11 +600,12 @@ public class Queries {
     //insert film
     private int insertMovie(Server s, int id, String title, String rating, int runtime){
         Statement stmt;
+        int success;
         try{
             String sql = "INSERT INTO film VALUES (" + Integer.toString(id) + ", " + title + ", " + rating + ", " + Integer.toString(runtime) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
             stmt = s.createStatement();
-            int success = stmt.executeUpdate(sql);
+            success = stmt.executeUpdate(sql);
             if(success > 0){
                 System.out.println("Movie successfully added");
             } else{
@@ -639,11 +640,12 @@ public class Queries {
     //insert user
     private int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
         Statement stmt;
+        int success;
         try{
             String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
             stmt = s.createStatement();
-            int success = stmt.executeUpdate(sql);
+            success = stmt.executeUpdate(sql);
             if(success > 0){
                 System.out.println("User successfully added");
             } else{
@@ -681,11 +683,11 @@ public class Queries {
     //delete film based on name
     private int deleteMovie(Server s, String title){
         PreparedStatement ps;
-
+        int success;
         try{
             ps = s.prepareStatement("DELETE FROM film WHERE Title =?");
             ps.setString(1, title);
-            int success = ps.executeUpdate();
+            success = ps.executeUpdate();
             if(success > 0){
                 System.out.println("Movie successfully deleted");
             } else{
@@ -721,11 +723,12 @@ public class Queries {
     //delete user based on name
     private int deleteUser(Server s, String first, String last){
         PreparedStatement ps;
+        int success;
         try{
             ps = s.prepareStatement("DELETE FROM user WHERE First_Name =? AND Last_Name =?");
             ps.setString(1, first);
             ps.setString(2, last);
-            int success = ps.executeUpdate();
+            success = ps.executeUpdate();
             if(success > 0){
                 System.out.println("MoUser successfully deleted");
             } else{
@@ -757,10 +760,11 @@ public class Queries {
         return success;
 
     }
-
+    //Cancels ticket based on username and title being seen
     private int cancelTicket(Server s, String first, String last, String title){
         PreparedStatement ps, pstmt;
         ResultSet rs;
+        int success;
         try{
             pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
             pstmt.setString(1, first);
@@ -771,7 +775,7 @@ public class Queries {
             ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
             ps.setInt(1, userID);
             ps.setString(2, title);
-            int success = ps.executeUpdate();
+            success = ps.executeUpdate();
             if(success > 0){
                 System.out.println("Ticket successfully cancelled");
             } else{
@@ -809,348 +813,55 @@ public class Queries {
         return success;
     }
 
-    }
-
-//*****************************************************************************************************************
-    // BELOW HERE IS REFERENCE CODE FROM ASSIGN 5
-/*
-    private static void export(String arg, String arg1, String arg2, String arg3)
-    {
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        String filename = arg3;
-
-        String _url = arg;
-
-        try {
-            //  Connects to the SQL server then creates a statement.
-            conn = DriverManager.getConnection(_url, arg1, arg2);
-            stmt = conn.createStatement();
-
-            // query for sql to get the results
-            rs = stmt.executeQuery("Show Tables");
-            while (rs.next())
-            {
-                System.out.println(rs.getString(1));
-            }
-
-
-
-
-        }
-        catch (SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see above error to help solve.");
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see above error to help solve.");
-        }
-        // closes database resources
-        finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-                if (conn != null)
-                    conn.close();
-            }
-            catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-    }
-
-
-/*
-    //The query1 method runs a query on the server that shows all customers id numbers, name and total spent.
-      //It is the answer to part 1 of the assignment. And is a very simple query that the user has no adjustments to.
-
-
-    private static void query1(String arg, String arg1, String arg2)
-    {
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-
-        String _url = arg;
-        try {
-            //  Connects to the SQL server then creates a statement.
-            conn = DriverManager.getConnection(_url, arg1, arg2);
-            stmt = conn.createStatement();
-
-            // query for sql to get the results
-            rs = stmt.executeQuery("Select emp.EMPNO, emp.ENAME, dept.DNAME from emp, dept where emp.DEPTNO = dept.DEPTNO");
-
-            // Display the results in a Pretty way
-            ResultSetMetaData rsmd = rs.getMetaData();
-            System.out.print(rsmd.getColumnName(1) + "\t");
-            System.out.print(rsmd.getColumnName(2)+ "\t");
-            System.out.println(rsmd.getColumnName(3)+ "\t"+ "\n");
-
-            while (rs.next()) {
-                System.out.print(rs.getInt(1) + "\t");
-                System.out.print(rs.getString(2) + "\t ");
-                System.out.print(rs.getString(3) + "\t ");
-                System.out.println("");
-            }
-        }
-        catch (SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see above error to help solve.");
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see above error to help solve.");
-        }
-        // closes database resources
-        finally {
-            try {
-                if (rs != null)
-                    rs.close();
-                if (stmt != null)
-                    stmt.close();
-                if (conn != null)
-                    conn.close();
-            }
-            catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-    }
-     Takes in the args from the command line and it includes the dept no that is being searched for. Returns the dept name
-     * name of customer and the total amount spent rounded so it is easier to use.
-
-    private static void query2(String arg, String arg1, String arg2, String arg3)
-    {
-        ResultSet rs = null;
-        //Statement stmt = null; NOT USED here
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-
-        String _url = arg;
-        try {
-            //  Connects to the SQL server
-            conn = DriverManager.getConnection(_url, arg1, arg2);
-
-            // Step 3: Create a statement
-            pstmt = conn.prepareStatement
-
-                    ("Select dept.DNAME, customer.NAME, Round(customer.QUANTITY * product.PRICE)\"Total Spent\", " +
-                            "dept.DEPTNO from dept, customer, product where customer.PID = product.PRODID and" +
-                            " product.MADE_BY = dept.DEPTNO and dept.DEPTNO = ?");
-            pstmt.setString(1, arg3);
+    //Returns the user's current movies that they have tickets for.
+    private ResultSet getUserMovies(Server s, String first, String last){
+        PreparedStatement ps, pstmt;
+        ResultSet rs, rs2;
+        int userID;
+        try{
+            pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
             rs = pstmt.executeQuery();
+            userID = rs.getInt("User_ID");
+            
+            ps = s.prepareStatement("SELECT f.Title FROM Film f, Seat_Showtime ss, Film_Showtime fs WHERE fs.Film_ID = f.Film_ID and fs.Showtime_ID = ss.Showtime_ID and ss.user_ID = ?");
+            ps.setInt(1, userID);
+            rs2 = ps.executeQuery();
+            
+            return rs2;
 
-
-            // Display the results "Pretty?"
-            ResultSetMetaData rsmd = rs.getMetaData();
-            System.out.print(rsmd.getColumnName(1) + "\t");
-            System.out.print(rsmd.getColumnName(2)+ "\t" + "\t");
-            System.out.println(rsmd.getColumnName(3)+ "\t"+ "\n");
-
-            while (rs.next()) {
-                System.out.print(rs.getString(1) + "\t");
-                System.out.print(rs.getString(2) + "\t ");
-                System.out.print(rs.getInt(3) + "\t ");
-                System.out.println("");
-            }
+        }catch(SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when getting a user's movie tickets.");
         }
-        catch (SQLException sqlexc2)
+        catch (Exception exc)
         {
-            sqlexc2.printStackTrace();
-            System.out.println("A SQL error occurred. Please see above error to help solve.");
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting a user's movie tickets.");
         }
-        catch (Exception exc2)
-        {
-            exc2.printStackTrace();
-            System.out.println("An error occurred. Please see above error to help solve.");
-        }
-        // closes database resources
-        finally {
-            try {
-                if (rs != null)
+        finally
+        {            
+            try
+            {
+                if(rs != null){
                     rs.close();
-                if (pstmt != null)
+                }
+                if(rs2!= null)
+                {
+                    rs2.close();
+                }
+                if(pstmt!=null){
                     pstmt.close();
-                if (conn != null)
-                    conn.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
             }
-            catch (SQLException se) {
+            catch (SQLException se)
+            {
                 se.printStackTrace();
             }
         }
     }
-
-    private static void dml1(String arg, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6,String arg7)
-    {
-        ResultSet rs = null;
-        //Statement stmt = null;
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            String _url = arg;
-            conn = DriverManager.getConnection(_url, arg1, arg2);
-            // if autocommit is true then a transaction will be executed
-            // on each DDL or DML statement immediately, usually you want
-            // to set to false to batch within a single transaction.
-            conn.setAutoCommit(false);
-
-            // Step 2.1 - get the DB MetaData
-            DatabaseMetaData dbmd = (DatabaseMetaData) conn.getMetaData();
-
-            // get the table named customer if it exists
-            rs = dbmd.getTables(null, null, "customer", null);
-            if (rs.next())
-            {
-
-            }
-            if (rs != null) rs.close();
-
-            ps = conn.prepareStatement("INSERT INTO customer (CUSTID, PID, NAME, QUANTITY) Values (?,?,?,?)");
-            ps.setString(1, arg3);
-            ps.setString(2, arg4);
-            ps.setString(3, (arg5 + " " + arg6));
-            ps.setString(4, arg7);
-
-            if (ps.executeUpdate() > 0) {
-                System.out.println("SUCCESS!");
-            }
-            ps.close();
-
-            // Have to do this to write changes to a DB
-            conn.commit();
-        }
-        catch (SQLException sqlexc3)
-        {
-            sqlexc3.printStackTrace();
-            System.out.println("A SQL error occured. Please see above error to help solve.");
-        }
-        catch (Exception exc3)
-        {
-            exc3.printStackTrace();
-            System.out.println("An error occured. Please see above error to help solve.");
-        }
-        finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                {
-                    conn.close();
-                }
-            }
-            catch (SQLException se2) {
-                se2.printStackTrace();
-            }
-        }
-    }
-
-   Build XML DOcument from database. The XML object is returned to main method where it is written to flat file.
-    private static Document buildEmployeeXML(ResultSet rset, String arg, String arg1, String arg2, String arg3) throws Exception
-    {
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        String TableName;
-        Document xmlDoc = new DocumentImpl();
-        String _url = arg;
-         Creating the root element
-        //replace employeetable with countries to set a countries tag
-        Element rootElement = xmlDoc.createElement("JdbcLab");
-        xmlDoc.appendChild(rootElement);
-
-        while(rset.next())
-        {
-            TableName = rset.getString(1);
-            Element dataNode = xmlDoc.createElement(TableName);
-            dataNode.setAttribute(TableName, "");
-            try {
-                //  Connects to the SQL server then creates a statement.
-                conn = DriverManager.getConnection(_url, arg1, arg2);
-                stmt = conn.createStatement();
-
-                // query for sql to get the results
-                rs = stmt.executeQuery("Select * from " + TableName);
-
-                // Display the results in a Pretty way
-                ResultSetMetaData rsmd = rs.getMetaData();
-
-
-                System.out.print(rsmd.getColumnName(1) + "\t");
-                System.out.print(rsmd.getColumnName(2)+ "\t");
-                System.out.println(rsmd.getColumnName(3)+ "\t"+ "\n");
-
-                while (rs.next()) {
-                    System.out.print(rs.getInt(1) + "\t");
-                    System.out.print(rs.getString(2) + "\t ");
-                    System.out.print(rs.getString(3) + "\t ");
-                    System.out.println("");
-                }
-            }
-            catch (SQLException sqlexc)
-            {
-                sqlexc.printStackTrace();
-                System.out.println("A SQL error occurred. Please see above error to help solve.");
-            }
-            catch (Exception exc)
-            {
-                exc.printStackTrace();
-                System.out.println("An error occurred. Please see above error to help solve.");
-            }
-            // closes database resources
-            finally {
-                try {
-                    if (rs != null)
-                        rs.close();
-                    if (stmt != null)
-                        stmt.close();
-                    if (conn != null)
-                        conn.close();
-                }
-                catch (SQLException se) {
-                    se.printStackTrace();
-                }
-            }
-
-
-            // Creating elements within node DOM
-            Element data1 = xmlDoc.createElement("data1");
-            Element data2 = xmlDoc.createElement("data2");
-
-            //Populating node DOM with Data
-            data1.appendChild(xmlDoc.createTextNode(rset.getString("data1")));
-            data2.appendChild(xmlDoc.createTextNode(rset.getString("data2")));
-
-            dataNode.appendChild(data1);
-            dataNode.appendChild(data2);
-
-            // Appending emp to the Root Class
-            rootElement.appendChild(dataNode);
-        }
-        return xmlDoc;
-    }*/
-
-    /* printDOM will write the contents of xml document passed onto it out to a file
-    private static void printDOM(Document _xmlDoc, File _outputFile) throws Exception
-    {
-        OutputFormat outputFormat = new OutputFormat("XML","UTF-8",true);
-        FileWriter fileWriter = new FileWriter(_outputFile);
-
-        XMLSerializer xmlSerializer = new XMLSerializer(fileWriter, outputFormat);
-
-        xmlSerializer.asDOMSerializer();
-
-        xmlSerializer.serialize(_xmlDoc.getDocumentElement());
-    }
-
-
-
-*/
+}

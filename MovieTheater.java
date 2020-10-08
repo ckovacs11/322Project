@@ -183,6 +183,36 @@ public class MovieTheater
             }
         }
     }
+    //Cancels a user's ticket, so the seat becomes available again.
+    public static void cancelTicket(Connection server)
+    {
+        String userInput, movieName, userFirst, userLast;
+        boolean valid = false;
+        System.out.println("NOTICE all tickets are non refundable, so canceling a ticket will not incurr a refund.\n");
+        while(!valid)
+        {
+            System.out.println("Please enter the name of the user who has the ticket to be canceled: Ex: Bob Tob");
+            userInput = input.nextLine();
+            if (checkUser(server, userInput))
+            {
+                valid = true;
+                String[] splited = userInput.split("\\s+");
+                userFirst = splited[0];
+                userLast = splited[1];
+            }
+            else
+            {
+                System.out.println("That user was not found. Please check from the list of users and try again:");
+                printUsers(server);
+            }
+        }
+        valid = false;
+        printUserTickets(server, userFirst, userLast);
+        
+
+    }
+
+
     // Adds a movie to the theater based on user input. Will validate that the movie is not already in the theatre before adding.
     public static void addMovie(Connection server)
     {
@@ -1137,6 +1167,56 @@ public class MovieTheater
                 }
             }
             return randId;
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see error to help solve.");
+        }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
+    }
+        //Prints out all the movies that the user has a ticket for.
+    public static void printUserTickets(Connection server, String userFirst, String userLast)
+    {
+        ResultSet results;
+        int count = 0;
+        try
+        {
+            results = getUserMovies(server, userFirst, userLast);
+            System.out.println(userFirst + " " + userLast + " has tickets to:");
+            while(results.next())
+            {
+                System.out.println(results.getString(1));
+                count++;
+            }
+            if (count == 0)
+            {
+                System.out.println(userFirst + " " + userLast + " does not have any tickets.");
+            }
         }
         catch(SQLException sqlexc)
         {

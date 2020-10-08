@@ -44,6 +44,7 @@ public class Queries{
             } else {
                 System.out.println("Error in reserving seat");
             }
+            return success;
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when updating Seat.");
@@ -74,8 +75,7 @@ public class Queries{
             {
                 se.printStackTrace();
             }
-        }
-        return success;
+        }        
     }
 
     //returns the title, runtime, and rating for all movies

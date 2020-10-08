@@ -5,7 +5,6 @@ import java.util.*;
 import java.sql.*;
 import java.sql.Date;
 
-
 /* SER322 Fall 2020 Session A
  *   @Author: David Aldridge, Curtis Kovacs, Christopher Lopez, David Lacombe
  *   @Version :1.000000000
@@ -14,11 +13,11 @@ import java.sql.Date;
  * take in the Server URL, username and password to access the server. Then the main method will create a command line user interface and that will be where
  * the user makes the choices. The choices will call predetermined SQL queries from the database and allow the user to do a few things.
  */
-public class MovieTheater
+public class MovieTheater 
 {
     private static Connection server;
-    private static Scanner input = System.in;
-    private static Queries queries;
+    private static Scanner input = new Scanner (System.in);
+    static Queries queries = new Queries();
 
     public MovieTheater()
     {
@@ -39,7 +38,6 @@ public class MovieTheater
             {
                 server = DriverManager.getConnection(args[0], args[1], args[2]);
                 System.out.println("Connected......");
-                queries = new Queries();
                 mainMenu(server);
             }
             catch(SQLException sqlexc)
@@ -107,7 +105,7 @@ public class MovieTheater
                     case 4:
                     {
                         // Will pass connection user's_name(they enter a name? Should we have a method to get user names?)
-                        getRewards(server);
+                        findRewards(server);
                         break;
                     }
                     case 5:
@@ -184,6 +182,32 @@ public class MovieTheater
             }
         }
     }
+    // Takes in a user's name and returns their reward points.
+    public static void findRewards(Connection server)
+    {
+        String userInput,userFirst,userLast;
+        boolean valid = false;
+
+        while(!valid)
+        {
+            System.out.println("Please enter the name of the user you wish to see the current reward points for:\n Ex: \'Pointer McGee\'");
+            userInput = input.nextLine();
+            if(checkUser(server, userInput))
+            {
+                valid = true;
+                String[] splited = userInput.split("\\s+");
+                userFirst = splited[0];
+                userLast = splited[1];
+            }
+            else
+            {  
+                System.out.println("That was not a valid name. Here is a list of the current users in the reward system.");
+                printUsers(server);
+            }
+        }
+        printUserRewards(server, userFirst, userLast);
+    }
+
     //Cancels a user's ticket, so the seat becomes available again.
     public static void cancelTicket(Connection server)
     {
@@ -387,7 +411,7 @@ public class MovieTheater
     /*This method adds a user to the Rewards program. It will verify that the user is not already in the system.
     * the user will then be asked to add in information for the user.
     */
-    public static void addUser(Conneciton server)
+    public static void addUser(Connection server)
     {
         String userInput, newUserFirst, newUserLast, birthday;
         Integer userFunds, userRewards, userIntInput, userId;
@@ -459,7 +483,7 @@ public class MovieTheater
                 System.out.println(newUserFirst + " " + newUserLast + " can not have negative reward points...\nPlease enter a whole number that is 0 or greater.");
             }
         }
-        userId = generateId(server);
+        userId = generateUserId(server);
         queries.insertUser(userId,newUserFirst,newUserLast,birthday,userFunds,userRewards);
         System.out.println("Successfully added "+ newUserFirst + " " + newUserLast);
     }
@@ -471,6 +495,7 @@ public class MovieTheater
     {
         String userInput, movieChoice, showtimeChoice, seatChoice, userFirst,userLast;
         ResultSet results;
+        Integer userIntput;
         boolean validMovie = false, validTime = false, validSeat =false, validUser = false, validFunds = false ;
         try
         {
@@ -517,9 +542,9 @@ public class MovieTheater
             }            
             while (!validSeat)
             {
-                System.out.printf("Which seat would you like to reserve for %s at %s? %nPlease enter the seat number:%n For a list of available seats type \"Seats\"%n",movieChoice, showtimeChoice);
-                userInput = input.nextint();
-                if (userInputtoLowerCase().equals("seats"))
+                System.out.printf("Which seat would you like to reserve for %s at %s? %nPlease enter the seat number:%n For a list of available seats type \"-1\"%n",movieChoice, showtimeChoice);
+                userIntput = input.nextInt();
+                if (userIntput == -1)
                 {
                     printSeats(server, movieChoice, showtimeChoice);      
                 }
@@ -566,10 +591,10 @@ public class MovieTheater
                 }
             }
             results = queries.getUserInfo(server,userFirst,userLast); //Return the funds, rewards points and birthday of user
-            Date today = Date; //**********************CHECK THIS!!! Probably Wrong */
+            Date today = new Date(System.currentTimeMillis()); //**********************CHECK THIS!!! Probably Wrong */
             while (!validFunds)
             {
-                if (today == results.getString(3))
+                if (today.toString().equalsIgnoreCase(results.getString(3)))
                 {
                     System.out.println("Happy Birthday!\nEnjoy your free movie on us!\nTell your friends!");
                     validFunds = true;
@@ -718,12 +743,58 @@ public class MovieTheater
         }
     }
 
+    //Prints the user rewards points for the user queried
+    public static void printUserRewards(Connection server, String first, String last)
+    {
+        ResultSet results;
+        try
+        {
+            results = getUserRewards(server, first, last);
+            System.out.print(first + " " + last + " has ");
+            while (results.next())
+            {
+                System.out.print(results.getInt(1));
+                System.out.println(" reward points.");
+            }
+        }
+        catch(SQLException sqlexc)
+        {
+            sqlexc.printStackTrace();
+            System.out.println("A SQL error occurred. Please see error to help solve.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("An error occurred. Please see error to help solve.");
+        }        
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
+    }
+
     //Returns the user's reward points based on first,last and birthday.
     public static ResultSet getUserRewards(Connection server, String first, String last)
     {
         try
         {
-            return (queries.getRewards(server,first,last,bDay));
+            return (queries.getRewards(server,first,last));
         }
         catch(SQLException sqlexc)
         {
@@ -747,7 +818,6 @@ public class MovieTheater
             if (checkMovie(server, movie))
             {
                 results = getShowtimes(server, movie);
-                size = results.getlastRow();
                 System.out.println("The showtimes for " + movie + " are:");
                 while (results.next())
                 {
@@ -1227,7 +1297,7 @@ public class MovieTheater
         int count = 0;
         try
         {
-            results = getUserMovies(server, userFirst, userLast);
+            results = queries.getUserMovies(server, userFirst, userLast);
             System.out.println(userFirst + " " + userLast + " has tickets to:");
             while(results.next())
             {

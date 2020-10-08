@@ -3,6 +3,7 @@ package Ser322;
 import java.io.*;
 import java.util.*;
 import java.sql.*;
+import java.sql.Date;
 
 /* SER322 Fall 2020 Session A
  *   @Author: David Aldridge, Curtis Kovacs, Christopher Lopez, David Lacombe
@@ -11,13 +12,19 @@ import java.sql.*;
  * This class creates SQL queries to communicate with the mySQL database.
  */
 
-public class Queries {
+public class Queries{
 
-    public int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
+    public Queries()
+    {
+
+    }
+
+    public int updateSeat(Connection s, String first, String last, String title, String time, int seatNum){
         ResultSet rs;
+        PreparedStatement ps, pstmt;
         int success;
         try{
-            PreparedStatement pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt = s.createStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
             pstmt.setString(1, first);
             pstmt.setString(2, last);
             rs = pstmt.executeQuery();
@@ -26,7 +33,7 @@ public class Queries {
                 userID = rs.getInt(1);
             }
 
-            PreparedStatement ps = s.createStatement("UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
+            ps = s.createStatement("UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
             ps.setInt(1, userID);
             ps.setString(2, title);
             ps.setString(3, time);
@@ -50,6 +57,9 @@ public class Queries {
         {
             try
             {
+                if(s!=null){
+                    s.close();
+                }
                 if(rs != null){
                     rs.close();
                 }
@@ -69,7 +79,7 @@ public class Queries {
     }
 
     //returns the title, runtime, and rating for all movies
-	public ResultSet checkAvailableMovies(Server s){
+	public ResultSet checkAvailableMovies(Connection s){
         Statement stmt;
         ResultSet rs;
         try{
@@ -105,7 +115,7 @@ public class Queries {
 	}
 
     //returns all movie titles
-	public ResultSet getMovieTitles(Server s){
+	public ResultSet getMovieTitles(Connection s){
         Statement stmt;
         ResultSet rs;
         try{
@@ -141,7 +151,7 @@ public class Queries {
 	}
 
     //returns the showtimes for the given movie
-	public ResultSet getShowtimes(Server s, String name){
+	public ResultSet getShowtimes(Connection s, String name){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -178,7 +188,7 @@ public class Queries {
 	}
 
     //returns the seat IDs and Auditorium number
-	public ResultSet getSeats(Server server, String name, String time){
+	public ResultSet getSeats(Connection server, String name, String time){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -203,9 +213,6 @@ public class Queries {
                 if(rs != null){
                     rs.close();
                 }
-                if(pstmt!=null){
-                    pstmt.close();
-                }
                 if(ps!=null){
                     ps.close();
                 }
@@ -220,7 +227,7 @@ public class Queries {
 	}
 
     //get all users
-	public ResultSet getUsers(Server s){
+	public ResultSet getUsers(Connection s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -257,7 +264,7 @@ public class Queries {
 	}
 
     //get user ids
-    public ResultSet getUserIds(Server s){
+    public ResultSet getUserIds(Connection s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -293,7 +300,7 @@ public class Queries {
     }
 
     //get specific user info
-	public ResultSet getUserInfo(Server server, String first, String last){
+	public ResultSet getUserInfo(Connection server, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -331,7 +338,7 @@ public class Queries {
 	}
 
     //get all film ids
-    public ResultSet getFilmIds(Server s){
+    public ResultSet getFilmIds(Connection s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -354,7 +361,7 @@ public class Queries {
                 if(rs != null){
                     rs.close();
                 }
-                if(pstmt!=null){
+                if(stmt!=null){
                     stmt.close();
                 }
             }
@@ -367,7 +374,7 @@ public class Queries {
     }
 
     //get user.Funds
-    public ResultSet getFunds(Server s, String first, String last){
+    public ResultSet getFunds(Connection s, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -405,7 +412,7 @@ public class Queries {
     }
 
     //get user.Reward_Points
-    public ResultSet getPoints(Server s, String first, String last){
+    public ResultSet getPoints(Connection s, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -443,7 +450,7 @@ public class Queries {
     }
 
     //returns 1 if the method successfully updates the Reward Points.
-    public int updatePoints(Server s, String first, String last, int points){
+    public int updatePoints(Connection s, String first, String last, int points){
         PreparedStatement ps;
         int rowAffected;
         try{
@@ -481,7 +488,7 @@ public class Queries {
     }
 
     //returns 1 if the user's Reward Points have been successfully incremented
-    public int incrementPoints(Server s, String first, String last){
+    public int incrementPoints(Connection s, String first, String last){
         PreparedStatement ps, ps2;
         ResultSet rs;
         int rowAffected;
@@ -545,7 +552,7 @@ public class Queries {
     }
 
     //subract funds due to ticket purchase
-    public int subtractFunds(Server s, String first, String last) {
+    public int subtractFunds(Connection s, String first, String last) {
         PreparedStatement ps, ps2;
         ResultSet rs;
         int rowAffected;
@@ -598,7 +605,7 @@ public class Queries {
     }
 
     //insert film
-    public int insertMovie(Server s, int id, String title, String rating, int runtime){
+    public int insertMovie(Connection s, int id, String title, String rating, int runtime){
         Statement stmt;
         int success;
         try{
@@ -638,11 +645,11 @@ public class Queries {
     }
 
     //insert user
-    public int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
+    public int insertUser(Connection s, int id, String first, String last, Date bday, double funds, int points){
         Statement stmt;
         int success;
         try{
-            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + Date.toString(bday) +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
+            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + bday.toString() +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
             stmt = s.createStatement();
             success = stmt.executeUpdate(sql);
@@ -681,7 +688,7 @@ public class Queries {
 
 
     //delete film based on name
-    public int deleteMovie(Server s, String title){
+    public int deleteMovie(Connection s, String title){
         PreparedStatement ps;
         int success;
         try{
@@ -721,7 +728,7 @@ public class Queries {
     }
 
     //delete user based on name
-    public int deleteUser(Server s, String first, String last){
+    public int deleteUser(Connection s, String first, String last){
         PreparedStatement ps;
         int success;
         try{
@@ -761,7 +768,7 @@ public class Queries {
 
     }
     //Cancels ticket based on username and title being seen
-    public int cancelTicket(Server s, String first, String last, String title){
+    public int cancelTicket(Connection s, String first, String last, String title){
         PreparedStatement ps, pstmt;
         ResultSet rs;
         int success;
@@ -814,7 +821,7 @@ public class Queries {
     }
 
     //Returns the user's current movies that they have tickets for.
-    public ResultSet getUserMovies(Server s, String first, String last){
+    public ResultSet getUserMovies(Connection s, String first, String last){
         PreparedStatement ps, pstmt;
         ResultSet rs, rs2;
         int userID;

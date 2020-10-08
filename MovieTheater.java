@@ -125,6 +125,7 @@ public class MovieTheater
                     case 7:
                     {
                         //Cancel user ticket.
+                        cancelTicket(server);
                         break;
                     }
                     case 8:

@@ -208,8 +208,28 @@ public class MovieTheater
         }
         valid = false;
         printUserTickets(server, userFirst, userLast);
-        
-
+        while (!valid)
+        {
+            System.out.println("Please type which movie ticket to cancel.\n To return to the main menu type \'Cancel\': ");
+            userInput = input.nextLine();
+            if(userInput.equalsIgnoreCase("cancel"))
+            {
+                System.out.println("Returning to main menu...");
+                return;
+            }
+            if(checkMovie(server, userInput))
+            {
+                valid = true;
+                movieName = userInput;
+            }
+            else
+            {
+                System.out.println("That was not a valid choice, please select from the following list:");
+                printUserTickets(server, userFirst, userLast);
+            }
+        }
+        System.out.println("Canceling " + userFirst + " " + userLast + "'s ticket to " + movieName);
+        queries.cancelTicket(server, userFirst, userLast, movieName);
     }
 
 

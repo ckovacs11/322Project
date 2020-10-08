@@ -13,7 +13,7 @@ import java.sql.*;
 
 public class Queries {
 
-    private int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
+    public int updateSeat(Server s, String first, String last, String title, String time, int seatNum){
         ResultSet rs;
         int success;
         try{
@@ -69,7 +69,7 @@ public class Queries {
     }
 
     //returns the title, runtime, and rating for all movies
-	private ResultSet checkAvailableMovies(Server s){
+	public ResultSet checkAvailableMovies(Server s){
         Statement stmt;
         ResultSet rs;
         try{
@@ -105,7 +105,7 @@ public class Queries {
 	}
 
     //returns all movie titles
-	private ResultSet getMovieTitles(Server s){
+	public ResultSet getMovieTitles(Server s){
         Statement stmt;
         ResultSet rs;
         try{
@@ -141,7 +141,7 @@ public class Queries {
 	}
 
     //returns the showtimes for the given movie
-	private ResultSet getShowtimes(Server s, String name){
+	public ResultSet getShowtimes(Server s, String name){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -178,7 +178,7 @@ public class Queries {
 	}
 
     //returns the seat IDs and Auditorium number
-	private ResultSet getSeats(Server server, String name, String time){
+	public ResultSet getSeats(Server server, String name, String time){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -220,7 +220,7 @@ public class Queries {
 	}
 
     //get all users
-	private ResultSet getUsers(Server s){
+	public ResultSet getUsers(Server s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -257,7 +257,7 @@ public class Queries {
 	}
 
     //get user ids
-    private ResultSet getUserIds(Server s){
+    public ResultSet getUserIds(Server s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -293,7 +293,7 @@ public class Queries {
     }
 
     //get specific user info
-	private ResultSet getUserInfo(Server server, String first, String last){
+	public ResultSet getUserInfo(Server server, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -331,7 +331,7 @@ public class Queries {
 	}
 
     //get all film ids
-    private ResultSet getFilmIds(Server s){
+    public ResultSet getFilmIds(Server s){
         Statement stmt;
         ResultSet rs;
         try {
@@ -367,7 +367,7 @@ public class Queries {
     }
 
     //get user.Funds
-    private ResultSet getFunds(Server s, String first, String last){
+    public ResultSet getFunds(Server s, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -405,7 +405,7 @@ public class Queries {
     }
 
     //get user.Reward_Points
-    private ResultSet getPoints(Server s, String first, String last){
+    public ResultSet getPoints(Server s, String first, String last){
         PreparedStatement ps;
         ResultSet rs;
         try{
@@ -443,7 +443,7 @@ public class Queries {
     }
 
     //returns 1 if the method successfully updates the Reward Points.
-    private int updatePoints(Server s, String first, String last, int points){
+    public int updatePoints(Server s, String first, String last, int points){
         PreparedStatement ps;
         int rowAffected;
         try{
@@ -481,7 +481,7 @@ public class Queries {
     }
 
     //returns 1 if the user's Reward Points have been successfully incremented
-    private int incrementPoints(Server s, String first, String last){
+    public int incrementPoints(Server s, String first, String last){
         PreparedStatement ps, ps2;
         ResultSet rs;
         int rowAffected;
@@ -545,7 +545,7 @@ public class Queries {
     }
 
     //subract funds due to ticket purchase
-    private int subtractFunds(Server s, String first, String last) {
+    public int subtractFunds(Server s, String first, String last) {
         PreparedStatement ps, ps2;
         ResultSet rs;
         int rowAffected;
@@ -598,7 +598,7 @@ public class Queries {
     }
 
     //insert film
-    private int insertMovie(Server s, int id, String title, String rating, int runtime){
+    public int insertMovie(Server s, int id, String title, String rating, int runtime){
         Statement stmt;
         int success;
         try{
@@ -638,7 +638,7 @@ public class Queries {
     }
 
     //insert user
-    private int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
+    public int insertUser(Server s, int id, String first, String last, Date bday, double funds, int points){
         Statement stmt;
         int success;
         try{
@@ -681,7 +681,7 @@ public class Queries {
 
 
     //delete film based on name
-    private int deleteMovie(Server s, String title){
+    public int deleteMovie(Server s, String title){
         PreparedStatement ps;
         int success;
         try{
@@ -721,7 +721,7 @@ public class Queries {
     }
 
     //delete user based on name
-    private int deleteUser(Server s, String first, String last){
+    public int deleteUser(Server s, String first, String last){
         PreparedStatement ps;
         int success;
         try{
@@ -761,7 +761,7 @@ public class Queries {
 
     }
     //Cancels ticket based on username and title being seen
-    private int cancelTicket(Server s, String first, String last, String title){
+    public int cancelTicket(Server s, String first, String last, String title){
         PreparedStatement ps, pstmt;
         ResultSet rs;
         int success;
@@ -814,7 +814,7 @@ public class Queries {
     }
 
     //Returns the user's current movies that they have tickets for.
-    private ResultSet getUserMovies(Server s, String first, String last){
+    public ResultSet getUserMovies(Server s, String first, String last){
         PreparedStatement ps, pstmt;
         ResultSet rs, rs2;
         int userID;

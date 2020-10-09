@@ -1,6 +1,5 @@
 package ser322;
 
-import java.io.*;
 import java.util.*;
 import java.sql.*;
 import java.sql.Date;
@@ -360,7 +359,7 @@ public class MovieTheater {
             System.out
                     .println("Please enter " + newUserFirst + " " + newUserLast + "'s Birthday:\n Ex: \'2000-12-31\'");
             userInput = input.nextLine();
-            if (userInput.substring(4, 4).matches("-") && userInput.substring(7, 7).matches("-")) {
+            if (userInput.substring(4,5).matches("-") && userInput.substring(7, 8).matches("-")) {
                 valid = true;
                 birthday = userInput;
             } else {

@@ -12,16 +12,11 @@ import java.sql.Date;
  * take in the Server URL, username and password to access the server. Then the main method will create a command line user interface and that will be where
  * the user makes the choices. The choices will call predetermined SQL queries from the database and allow the user to do a few things.
  */
-public class MovieTheater 
+public class MovieTheater
 {
     private static Connection server;
     private static Scanner input = new Scanner (System.in);
-    private static Queries queries = new Queries();
 
-    public MovieTheater()
-    {
-
-    }
 
     public static void main(String[] args)
     {
@@ -64,7 +59,7 @@ public class MovieTheater
         }
     }
     private static void mainMenu(Connection server)
-    {   
+    {
             Integer selection = 0;
             String mainMen = "Hello,\n Please select from the following options: \n\n1. Check available Movies.\n";
             mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
@@ -85,10 +80,10 @@ public class MovieTheater
                     case 1: //prints all current movies in the theater.
                     {
                         printMovies(server);
-                        break;                        
+                        break;
                     }
                     case 2: //Walks the user through the process of buying a ticket.
-                    {                        
+                    {
                         buyTicket(server);
                         break;
                     }
@@ -155,6 +150,7 @@ public class MovieTheater
             }
             System.out.println(mainMen);
         }
+
     }
     // Takes in a user's name and returns their reward points.
     public static void findRewards(Connection server)
@@ -174,7 +170,7 @@ public class MovieTheater
                 userLast = splited[1];
             }
             else
-            {  
+            {
                 System.out.println("That was not a valid name. Here is a list of the current users in the reward system.");
                 printUsers(server);
             }
@@ -287,7 +283,7 @@ public class MovieTheater
         queries.insertMovie(server,movieId,movieName,movieRating,movieRuntime);
         System.out.println(movieName + " has been added to the theater's available movies.");
     }
-    
+
     // Deletes a movie from the theater based on user input. And it ensures that there is the minimum of 10 movies in the theatre at any one time.
     public static void deleteMovie(Connection server)
     {
@@ -333,7 +329,7 @@ public class MovieTheater
         boolean valid = false;
         while (!valid)
         {
-            System.out.println("Please enter the name of the movie you wish to check the showtimes for:\n");   
+            System.out.println("Please enter the name of the movie you wish to check the showtimes for:\n");
             userInput = input.nextLine();
             if(checkMovie(server, userInput))
             {
@@ -393,13 +389,13 @@ public class MovieTheater
         while(!valid)
         {
             System.out.println("Please enter the First and Last name of the new user you wish to add:(Separted by a space)\n Ex: Tim Tom");
-            userInput = input.nextLine();         
+            userInput = input.nextLine();
             if (userInput.equalsIgnoreCase("cancel"))
             {
                 System.out.println("Returning to Main Menu....");
                 return; //exits the addUser method back to the main menu
-            }  
-            
+            }
+
             if (!checkUser(server, userInput)) //return of false means the user was not found.
             {
                 valid = true;
@@ -407,7 +403,7 @@ public class MovieTheater
                 newUserFirst = splited[0];
                 newUserLast = splited[1];
             }
-            else 
+            else
             {
                 System.out.println(userInput + " is already in the system. Please enter a different name.\nTo cancel adding a new user type \'Cancel\'");
             }
@@ -425,10 +421,10 @@ public class MovieTheater
             else
             {
                 System.out.println("There was an error with the date you entered, please be sure to follow the Year-Month-Day format. Include the \'-\' in the date.");
-            }            
+            }
         }
         valid = false;
-        while(!valid) 
+        while(!valid)
         {
             System.out.println("Please enter the funds that " + newUserFirst + " " + newUserLast + " has:\n(Any positive whole number)\n");
             userIntInput = input.nextInt();
@@ -443,7 +439,7 @@ public class MovieTheater
             }
         }
         valid = false;
-        while(!valid) 
+        while(!valid)
         {
             System.out.println("Please enter the rewards that " + newUserFirst + " " + newUserLast + " has:\n(Any positive whole number)\n");
             userIntInput = input.nextInt();
@@ -471,6 +467,8 @@ public class MovieTheater
         ResultSet results = null;
         Integer userIntput=-1, seatChoice = 0;
         boolean validMovie = false, validTime = false, validSeat =false, validUser = false, validFunds = false ;
+        PreparedStatement ps = null, pstmt = null;
+        int success = 0, userID = 0;
         try
         {
             while (!validMovie)
@@ -490,7 +488,7 @@ public class MovieTheater
                         printMovies(server);
                     }
                 }
-            }            
+            }
             while (!validTime)
             {
                 System.out.printf("Which Showtime would you like to see %s? %nPlease enter the time:(Example\"12:20\"%nFor a list of times type \"Times\"%n",movieChoice);
@@ -513,14 +511,14 @@ public class MovieTheater
                         printShowtimes(server, movieChoice);
                     }
                 }
-            }            
+            }
             while (!validSeat)
             {
                 System.out.printf("Which seat would you like to reserve for %s at %s? %nPlease enter the seat number:%n For a list of available seats type \"-1\"%n",movieChoice, showtimeChoice);
                 userIntput = input.nextInt();
                 if (userIntput == -1)
                 {
-                    printSeats(server, movieChoice, showtimeChoice);      
+                    printSeats(server, movieChoice, showtimeChoice);
                 }
                 else
                 {
@@ -559,10 +557,15 @@ public class MovieTheater
                 if(!validUser)
                 {
                     System.out.println("That user's name was not found.\n Please check the list of users below.\nIf we have an error in your name please contact your system Admin...\n");
-                    printUsers(server);                                         
+                    printUsers(server);
                 }
             }
-            results = queries.getUserInfo(server,userFirst,userLast); //Return the funds, rewards points and birthday of user
+
+            ps = server.prepareStatement("SELECT * FROM user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            results = ps.executeQuery();
+
             Date today = new Date(System.currentTimeMillis()); //**********************CHECK THIS!!! Probably Wrong */
             while (!validFunds)
             {
@@ -580,8 +583,39 @@ public class MovieTheater
                 else if(results.getInt(1) > 9)
                 {
                     System.out.printf("Purchasing 1 ticket for %s%nAt:%s%nSeat:%s%n",movieChoice,showtimeChoice,seatChoice);
-                    queries.subtractFunds(server, userFirst, userLast); // removes funds from user to purchase ticket.
-                    queries.incrementPoints(server, userFirst, userLast); //Adds 1 reward point to the user for buying a ticket.
+
+                    // removes funds from user to purchase ticket.
+                    double funds = 0;
+                    ps = s.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
+                    ps.setString(1, userFirst);
+                    ps.setString(2, userLast);
+                    rs = ps.executeQuery();
+                    while (results.next()) {
+                        funds = results.getDouble(1) - 5;
+                    }
+
+                    pstmt = s.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
+                    pstmt.setDouble(1, funds);
+                    pstmt.setString(2, userFirst);
+                    pstmt.setString(3, userLast);
+                    pstmt.executeUpdate();
+
+                    //Adds 1 reward point to the user for buying a ticket.
+                    int new_points = 0;
+                    ps = s.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
+                    ps.setString(1, userFirst);
+                    ps.setString(2, userLast);
+                    results = ps.executeQuery();
+                    while (results.next())
+                        {
+                            new_points = results.getInt(1) + 1;
+                        }
+
+                    pstmt = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+                    pstmt.setInt(1, new_points);
+                    pstmt.setString(2, userFirst);
+                    pstmt.setString(3, userLast);
+                    pstmt.executeUpdate();
                     validFunds = true;
                 }
                 else
@@ -590,9 +624,30 @@ public class MovieTheater
                     break;
                 }
 
-                queries.updateSeat(server,userFirst,userLast,movieChoice,showtimeChoice,seatChoice);
+                pstmt = s.prepareStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+                pstmt.setString(1, userFirst);
+                pstmt.setString(2, userLast);
+                results = pstmt.executeQuery();
+
+                while(results.next()){
+                    userID = results.getInt(1);
+                }
+
+                //reserve seat
+                ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
+                ps.setInt(1, userID);
+                ps.setString(2, movieChoice);
+                ps.setString(3, showtimeChoice);
+                ps.setInt(4, seatChoice);
+                success = ps.executeUpdate();
+                if(success > 0){
+                    System.out.println("Seat successfully reserved");
+                } else {
+                    System.out.println("Error in reserving seat");
+                }
                 System.out.println("Enjoy your movie, and dont forget the popcorn!");
             }
+
         }
         catch(SQLException sqlexc)
         {
@@ -604,15 +659,44 @@ public class MovieTheater
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
         }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+                if(pstmt!=null){
+                    pstmt.close();
+                }
+
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
     }
 
     // Returns a list of all valid users first, and last names)
     public static ResultSet getAllUsers(Connection server)
     {
         ResultSet results = null;
+        Statement stmt = null;
         try
         {
-            results =  (queries.getUsers(server));
+          stmt = s.createStatement();
+          results = stmt.executeQuery("SELECT * FROM user");
         }
         catch (Exception exc)
         {
@@ -626,9 +710,11 @@ public class MovieTheater
     public static void printUsers(Connection server)
     {
         ResultSet results = null;
+        Statement stmt = null;
         try
         {
-            results = getAllUsers(server);
+            stmt = s.createStatement();
+            results = stmt.executeQuery("SELECT * FROM user");
             System.out.println("List of Current users:\n");
             while (results.next())
             {
@@ -653,6 +739,9 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if(stmt!=null){
+                    stmt.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -671,9 +760,11 @@ public class MovieTheater
     public static boolean checkUser(Connection server, String name)
     {
         ResultSet results = null;
+        Statement stmt = null;
         try
         {
-            results = getAllUsers(server);
+            stmt = s.createStatement();
+            results = stmt.executeQuery("SELECT * FROM user");
             while (results.next())
             {
                 if (name.equalsIgnoreCase(results.getString(1) +" " + results.getString(2)))
@@ -696,7 +787,13 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -716,9 +813,13 @@ public class MovieTheater
     public static void printUserRewards(Connection server, String first, String last)
     {
         ResultSet results = null;
+        PreparedStatement ps = null;
         try
         {
-            results = getUserRewards(server, first, last);
+            ps = server.prepareStatement("SELECT user.reward_Points FROM user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            results = ps.executeQuery();
             System.out.print(first + " " + last + " has ");
             while (results.next())
             {
@@ -735,7 +836,7 @@ public class MovieTheater
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
-        }        
+        }
         finally
         {
             try
@@ -743,6 +844,9 @@ public class MovieTheater
                 if (results != null)
                 {
                     results.close();
+                }
+                if(ps!=null){
+                    ps.close();
                 }
             }
             catch(SQLException sqlexc)
@@ -758,32 +862,19 @@ public class MovieTheater
         }
     }
 
-    //Returns the user's reward points based on first,last and birthday.
-    public static ResultSet getUserRewards(Connection server, String first, String last)
-    {
-        ResultSet results= null;
-        try
-        {
-            results = queries.getRewards(server,first,last);
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        }
-        return results;
-    }
-
-    // Prints out all the showtimes for the selected movie 
+    // Prints out all the showtimes for the selected movie
     public static void printShowtimes(Connection server, String movie)
     {
         ResultSet results = null;
         int size = 0;
+        PreparedStatement ps = null;
         try
         {
             if (checkMovie(server, movie))
             {
-                results = getShowtimes(server, movie);
+                ps = s.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+                ps.setString(1, name);
+                results = ps.executeQuery();
                 System.out.println("The showtimes for " + movie + " are:");
                 while (results.next())
                 {
@@ -809,7 +900,7 @@ public class MovieTheater
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
-        }        
+        }
         finally
         {
             try
@@ -817,6 +908,10 @@ public class MovieTheater
                 if (results != null)
                 {
                     results.close();
+                }
+
+                if(ps != null){
+                  ps.close();
                 }
             }
             catch(SQLException sqlexc)
@@ -836,9 +931,15 @@ public class MovieTheater
     {
         ResultSet results = null;
         boolean toRet =false;
+        PreparedStatement ps = null;
         try
         {
-            results = getShowtimes(server, movie);
+            if (checkMovie(server, movie))
+            {
+              ps = s.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+              ps.setString(1, name);
+              results = ps.executeQuery();
+            }
             while (results.next())
             {
                 if (time.equalsIgnoreCase(results.getString(1)))
@@ -865,6 +966,9 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if (ps != null){
+                  ps.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -880,38 +984,24 @@ public class MovieTheater
         return toRet;
     }
 
-
-    //gets the showtimes of the user requested movie
-    public static ResultSet getShowtimes(Connection server, String movie)
-    {
-        ResultSet results = null;
-        try
-        {
-            if (checkMovie(server, movie))
-            {
-                results =  queries.getShowtimes(server,movie);
-            }
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        }
-        return results;
-    }
     // Prints out all movies on the database.
     public static void printMovies(Connection server)
     {
         ResultSet results = null;
+        Statement stmt = null;
         try
         {
-            results = getAvailableMovies(server);
-            System.out.println("Current Movies:");
-            while(results.next())
-            {
-                System.out.println(results.getString(1));
-            }
+
+          stmt = s.createStatement();
+          results = stmt.executeQuery("SELECT Title FROM film");
         }
+
+          System.out.println("Current Movies:");
+          while(results.next())
+          {
+              System.out.println(results.getString(1));
+          }
+
         catch(SQLException sqlexc)
         {
             sqlexc.printStackTrace();
@@ -930,6 +1020,8 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if(stmt!=null){
+                    stmt.close();
             }
             catch(SQLException sqlexc)
             {
@@ -942,42 +1034,6 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
-    }
-
-    //Returns the result set of all movies titles on the database.
-    public static ResultSet getAvailableMovies(Connection server)
-    {
-        ResultSet results = null;
-        try
-        {
-            results = (queries.getMovieTitles(server));
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        }
-        finally
-        {
-            try
-            {
-                if (results != null)
-                {
-                    results.close();
-                }
-            }
-            catch(SQLException sqlexc)
-            {
-                sqlexc.printStackTrace();
-                System.out.println("A SQL error occurred. Please see error to help solve.");
-            }
-            catch (Exception exc)
-            {
-                exc.printStackTrace();
-                System.out.println("An error occurred. Please see error to help solve.");
-            }
-        }
-        return results;
     }
 
     //Checks if the selected movie is in the database. Uses the connection to the SQL server to check.
@@ -985,9 +1041,12 @@ public class MovieTheater
     {
         ResultSet results = null;
         boolean toRet = false;
+        Statement stmt = null;
         try
         {
-            results = getAvailableMovies(server);
+
+          stmt = s.createStatement();
+          results = stmt.executeQuery("SELECT Title FROM film");
             while (results.next())
             {
                 if(results.getString(1).equalsIgnoreCase(movie))
@@ -1036,9 +1095,13 @@ public class MovieTheater
     public static void printSeats(Connection server, String movie, String showtime)
     {
         ResultSet results = null;
+        PreparedStatement ps = null;
         try
         {
-            results = getSeats(server,movie,showtime);
+            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
+            ps.setString(1, time);
+            ps.setString(2, name);
+            results = ps.executeQuery();
             System.out.println("The available seats for " + movie + " at " + showtime + " are:");
             while (results.next())
             {
@@ -1060,7 +1123,13 @@ public class MovieTheater
         {
             try
             {
-                results.close();
+                if (results != null)
+                {
+                    results.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -1080,10 +1149,14 @@ public class MovieTheater
     public static boolean checkSeat(Connection server, String movie, String showtime, Integer seat)
     {
         ResultSet results = null;
+        PreparedStatement ps = null;
         boolean toRet = false;
         try
         {
-            results = getSeats(server,movie,showtime);
+            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
+            ps.setString(1, time);
+            ps.setString(2, name);
+            results = ps.executeQuery();
             while (results.next())
             {
                 if(results.getInt(1) == seat)
@@ -1111,6 +1184,9 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if(ps!=null){
+                    ps.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -1126,46 +1202,11 @@ public class MovieTheater
         return toRet;
     }
 
-    //gets all available seats for the selected movie and showtime. where the userId is Null
-    public static ResultSet getSeats(Connection server, String movie, String showtime)
-    {
-        ResultSet results = null;
-        try
-            {
-                results = (queries.getSeats(server,movie,showtime));
-            }
-            catch (Exception exc)
-            {
-                exc.printStackTrace();
-                System.out.println("An error occurred. Please see error to help solve.");
-            }
-            finally
-            {
-                try
-                {
-                    if (results != null)
-                    {
-                        results.close();
-                    }
-                }
-                catch(SQLException sqlexc)
-                {
-                    sqlexc.printStackTrace();
-                    System.out.println("A SQL error occurred. Please see error to help solve.");
-                }
-                catch (Exception exc)
-                {
-                    exc.printStackTrace();
-                    System.out.println("An error occurred. Please see error to help solve.");
-                }
-            }
-            return results;
-    }
-
     //Generates a random 5 didgit number for userID and checks that it is not already used. If it is then it will re-generate a new number and check again.
     public static int generateUserId(Connection server)
     {
         ResultSet results = null;
+        Statement stmt = null;
         Integer randId=00000;
         boolean valid = false, match = false;
         try
@@ -1173,7 +1214,8 @@ public class MovieTheater
             while (!valid)
             {
                 randId = 10000 + new Random().nextInt(90000); // 10000 ≤ n ≤ 99999
-                results = queries.getUserIds(server);
+                stmt = s.createStatement();
+                results = stmt.executeQuery("SELECT User_ID FROM user");
                 while (results.next())
                 {
                     if (randId == results.getInt(1))
@@ -1181,7 +1223,7 @@ public class MovieTheater
                         match = true;
                         break;
                     }
-                
+
                     if (!match) // if the userId was not found
                     {
                         valid = true;
@@ -1211,6 +1253,9 @@ public class MovieTheater
                 if (results != null)
                 {
                     results.close();
+                }
+                if(stmt!=null){
+                    stmt.close();
                 }
             }
             catch(SQLException sqlexc)
@@ -1230,6 +1275,7 @@ public class MovieTheater
     public static int generateFilmId(Connection server)
     {
         ResultSet results = null;
+        Statement stmt = null;
         Integer randId = 00000;
         boolean valid = false, match = false;
         try
@@ -1237,7 +1283,8 @@ public class MovieTheater
             while (!valid)
             {
                 randId = 10000 + new Random().nextInt(90000); // 10000 ≤ n ≤ 99999
-                results = queries.getFilmIds(server);
+                stmt = s.createStatement();
+                results = stmt.executeQuery("SELECT Film_ID FROM film");
                 while (results.next())
                 {
                     if (randId == results.getInt(1))
@@ -1245,7 +1292,7 @@ public class MovieTheater
                         match = true;
                         break;
                     }
-                
+
                     if (!match) // if the userId was not found
                     {
                         valid = true;
@@ -1276,6 +1323,9 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if(stmt!=null){
+                    stmt.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -1293,11 +1343,20 @@ public class MovieTheater
         //Prints out all the movies that the user has a ticket for.
     public static void printUserTickets(Connection server, String userFirst, String userLast)
     {
-        ResultSet results = null;
+        ResultSet results = null, rs = null;
+        PreparedStatement ps = null, pstmt = null;
         int count = 0;
         try
         {
-            results = queries.getUserMovies(server, userFirst, userLast);
+            pstmt = s.prepareStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+            rs = pstmt.executeQuery();
+            userID = rs.getInt("User_ID");
+
+            ps = s.prepareStatement("SELECT f.Title FROM Film f, Seat_Showtime ss, Film_Showtime fs WHERE fs.Film_ID = f.Film_ID and fs.Showtime_ID = ss.Showtime_ID and ss.user_ID = ?");
+            ps.setInt(1, userID);
+            results = ps.executeQuery();
             System.out.println(userFirst + " " + userLast + " has tickets to:");
             while(results.next())
             {
@@ -1327,6 +1386,12 @@ public class MovieTheater
                 {
                     results.close();
                 }
+                if(pstmt!=null){
+                    pstmt.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
             }
             catch(SQLException sqlexc)
             {
@@ -1345,13 +1410,16 @@ public class MovieTheater
     {
         Integer count = 0;
         ResultSet results = null;
+        Statement stmt = null;
         try
         {
-            results = getAvailableMovies(server);
+
+          stmt = s.createStatement();
+          results = stmt.executeQuery("SELECT Title FROM film");
             while (results.next())
             {
                 count++;
-            }        
+            }
         }
         catch(SQLException sqlexc)
         {
@@ -1370,6 +1438,9 @@ public class MovieTheater
                 if (results != null)
                 {
                     results.close();
+                }
+                if(stmt!=null){
+                    pstmt.close();
                 }
             }
             catch(SQLException sqlexc)

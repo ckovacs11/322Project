@@ -68,7 +68,7 @@ public class MovieTheater
             Integer selection = 0;
             String mainMen = "Hello,\n Please select from the following options: \n\n1. Check available Movies.\n";
             mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
-            mainMen = mainMen + "5. Add movie.\n6. Delete Movie. \n7.Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
+            mainMen = mainMen + "5. Add movie.\n6. Delete Movie. \n7. Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
             mainMen = mainMen + "9. Add user.\n10. Delete user.\n11. Exit.\n";
             while(selection != -1)
             {
@@ -143,6 +143,7 @@ public class MovieTheater
                     case 11:
                     {
                         selection = -1;
+                        System.exit(1);
                         break;
                     }
                     default:

@@ -75,7 +75,7 @@ public class Queries{
         try{
 		stmt = s.createStatement();
 		rs = stmt.executeQuery("SELECT Title, Rating, Runtime FROM film");
-
+        return rs;
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when checking movies.");
@@ -101,7 +101,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-		return rs;
+		
 	}
 
     //returns all movie titles
@@ -111,7 +111,7 @@ public class Queries{
         try{
 		stmt = s.createStatement();
         rs = stmt.executeQuery("SELECT Title FROM film");
-        
+		return rs;
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting movie titles.");
@@ -137,7 +137,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-		return rs;
+		
 	}
 
     //returns the showtimes for the given movie
@@ -149,6 +149,7 @@ public class Queries{
 		ps.setString(1, name);
 		rs = ps.executeQuery();
 
+		return rs;
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting showtimes.");
@@ -174,7 +175,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-		return rs;
+		
 	}
 
     //returns the seat IDs and Auditorium number
@@ -187,6 +188,7 @@ public class Queries{
 		ps.setString(2, name);
 		rs = ps.executeQuery();
 
+        return rs;
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting seats.");
@@ -212,7 +214,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-		 return rs;
+		
 
 	}
 
@@ -223,7 +225,7 @@ public class Queries{
         try {
             stmt = s.createStatement();
             rs = stmt.executeQuery("SELECT * FROM user");
-
+            return rs;
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when checking movies.");
@@ -249,8 +251,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
-
+		
 	}
 
     //get user ids
@@ -260,7 +261,7 @@ public class Queries{
         try {
             stmt = s.createStatement();
             rs = stmt.executeQuery("SELECT User_ID FROM user");
-
+            return rs;
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting user Ids.");
@@ -286,7 +287,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
+		
     }
 
     //get specific user info
@@ -298,7 +299,7 @@ public class Queries{
             ps.setString(1, first);
             ps.setString(2, last);
             rs = ps.executeQuery();
-
+            return rs;
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting seats.");
@@ -324,7 +325,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
+		
 	}
 
     //get all film ids
@@ -334,7 +335,7 @@ public class Queries{
         try {
             stmt = s.createStatement();
             rs = stmt.executeQuery("SELECT Film_ID FROM film");
-
+            return rs;
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting user Ids.");
@@ -360,7 +361,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
+		
     }
 
     //get user.Funds
@@ -372,7 +373,7 @@ public class Queries{
             ps.setString(1, first);
             ps.setString(2, last);
             rs = ps.executeQuery();
-       
+            return rs;
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting funds.");
@@ -397,8 +398,8 @@ public class Queries{
             {
                 se.printStackTrace();
             }
-        }
-        return rs;
+        }        
+		
     }
 
     //get user.Reward_Points
@@ -410,7 +411,7 @@ public class Queries{
             ps.setString(1, first);
             ps.setString(2, last);
             rs = ps.executeQuery();
- 
+            return rs;
         }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting reward points.");
@@ -436,7 +437,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
+		
     }
 
     //returns 1 if the method successfully updates the Reward Points.
@@ -449,7 +450,7 @@ public class Queries{
         ps.setString(2, first);
         ps.setString(3, last);
         rowAffected = ps.executeUpdate();
-
+        
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when updating reward points.");
@@ -472,9 +473,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-       
         return rowAffected;
-
     }
 
     //returns 1 if the user's Reward Points have been successfully incremented
@@ -860,7 +859,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs2;
+		
     }
 
     //Gets user reward points
@@ -873,7 +872,7 @@ public class Queries{
             ps.setString(1, first);
             ps.setString(2, last);
             rs = ps.executeQuery();
-
+            return rs;
         } catch (SQLException se) {
             se.printStackTrace();
             System.out.println("Error occurred when getting seats.");
@@ -899,7 +898,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-        return rs;
+		
     }
 
      //Gets user funds
@@ -912,7 +911,7 @@ public class Queries{
              ps.setString(1, first);
              ps.setString(2, last);
              rs = ps.executeQuery();
- 
+             return rs;
          } catch (SQLException se) {
              se.printStackTrace();
              System.out.println("Error occurred when getting seats.");
@@ -937,7 +936,7 @@ public class Queries{
              {
                  se.printStackTrace();
              }
-         }
-         return rs;
+         }         
+		
      }
 }

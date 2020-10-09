@@ -1,7 +1,5 @@
-package Ser322;
+package ser322;
 
-import java.io.*;
-import java.util.*;
 import java.sql.*;
 import java.sql.Date;
 
@@ -864,4 +862,82 @@ public class Queries{
         }
         return rs2;
     }
+
+    //Gets user reward points
+    public ResultSet getRewards(Connection server, String first, String last)
+    {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = server.prepareStatement("SELECT user.reward_Points FROM user WHERE First_Name=? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            rs = ps.executeQuery();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
+        catch (Exception exc)
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when getting seats.");
+        }
+        finally
+        {
+            try
+            {
+                if(rs != null){
+                    rs.close();
+                }
+                if(ps!=null){
+                    ps.close();
+                }
+            }
+            catch (SQLException se)
+            {
+                se.printStackTrace();
+            }
+        }
+        return rs;
+    }
+
+     //Gets user funds
+     public ResultSet getFundss(Connection server, String first, String last)
+     {
+         PreparedStatement ps = null;
+         ResultSet rs = null;
+         try {
+             ps = server.prepareStatement("SELECT user.funds FROM user WHERE First_Name=? AND Last_Name=?");
+             ps.setString(1, first);
+             ps.setString(2, last);
+             rs = ps.executeQuery();
+ 
+         } catch (SQLException se) {
+             se.printStackTrace();
+             System.out.println("Error occurred when getting seats.");
+         }
+         catch (Exception exc)
+         {
+             exc.printStackTrace();
+             System.out.println("Error occurred when getting seats.");
+         }
+         finally
+         {
+             try
+             {
+                 if(rs != null){
+                     rs.close();
+                 }
+                 if(ps!=null){
+                     ps.close();
+                 }
+             }
+             catch (SQLException se)
+             {
+                 se.printStackTrace();
+             }
+         }
+         return rs;
+     }
 }

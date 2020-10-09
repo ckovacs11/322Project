@@ -1,4 +1,4 @@
-package Ser322;
+package ser322;
 
 import java.io.*;
 import java.util.*;
@@ -65,9 +65,7 @@ public class MovieTheater
         }
     }
     private static void mainMenu(Connection server)
-    {
-        try
-        {
+    {   
             Integer selection = 0;
             String mainMen = "Hello,\n Please select from the following options: \n\n1. Check available Movies.\n";
             mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
@@ -153,39 +151,15 @@ public class MovieTheater
                         System.out.println("That is not a valid selection please choose a valid option. Also how did you get here?");
                         break;
                     }
-
-                    }
                 }
             }
             System.out.println(mainMen);
-        }
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        }
-        finally
-        {
-            try
-            {
-                if (server != null)
-                {server.close();}
-            }
-            catch (SQLException se)
-            {
-                se.printStackTrace();
-            }
         }
     }
     // Takes in a user's name and returns their reward points.
     public static void findRewards(Connection server)
     {
-        String userInput,userFirst,userLast;
+        String userInput, userFirst = "", userLast="";
         boolean valid = false;
 
         while(!valid)
@@ -211,7 +185,7 @@ public class MovieTheater
     //Cancels a user's ticket, so the seat becomes available again.
     public static void cancelTicket(Connection server)
     {
-        String userInput, movieName, userFirst, userLast;
+        String userInput, movieName = "", userFirst="", userLast="";
         boolean valid = false;
         System.out.println("NOTICE all tickets are non refundable, so canceling a ticket will not incurr a refund.\n");
         while(!valid)
@@ -261,8 +235,8 @@ public class MovieTheater
     // Adds a movie to the theater based on user input. Will validate that the movie is not already in the theatre before adding.
     public static void addMovie(Connection server)
     {
-        String userInput, movieName, movieRating;
-        Integer movieRuntime, movieId, userINTput;
+        String userInput="", movieName ="", movieRating="";
+        Integer movieRuntime=0, movieId=0, userINTput=0;
         boolean valid = false;
         while(!valid)
         {
@@ -317,7 +291,7 @@ public class MovieTheater
     // Deletes a movie from the theater based on user input. And it ensures that there is the minimum of 10 movies in the theatre at any one time.
     public static void deleteMovie(Connection server)
     {
-        String userInput;
+        String userInput ="";
         boolean valid = false;
 
         while (!valid)
@@ -355,7 +329,7 @@ public class MovieTheater
     // Prints all showtimes for a user entered movie name.
     public static void getShowtime(Connection server)
     {
-        String userInput;
+        String userInput="";
         boolean valid = false;
         while (!valid)
         {
@@ -379,7 +353,7 @@ public class MovieTheater
     */
     public static void deleteUser(Connection server)
     {
-        String userInput, userFirst, userLast;
+        String userInput="", userFirst="", userLast="";
         boolean valid = false;
         while(!valid)
         {
@@ -493,9 +467,9 @@ public class MovieTheater
     */
     private static void buyTicket(Connection server)
     {
-        String userInput, movieChoice, showtimeChoice, seatChoice, userFirst,userLast;
-        ResultSet results;
-        Integer userIntput;
+        String userInput="", movieChoice= "", showtimeChoice="", seatChoice="", userFirst="",userLast="";
+        ResultSet results = null;
+        Integer userIntput=-1;
         boolean validMovie = false, validTime = false, validSeat =false, validUser = false, validFunds = false ;
         try
         {
@@ -553,7 +527,7 @@ public class MovieTheater
                     if(checkSeat(server, movieChoice, showtimeChoice, Integer.parseInt(userInput)))
                     {
                         validSeat = true;
-                        seatChoice = userInput;
+                        seatChoice = Integer.toString(userIntput);
                         break;
                     }
                 }
@@ -608,7 +582,7 @@ public class MovieTheater
                 else if(results.getInt(1) > 9)
                 {
                     System.out.printf("Purchasing 1 ticket for %s%nAt:%s%nSeat:%s%n",movieChoice,showtimeChoice,seatChoice);
-                    queries.updateFunds(server, userFirst, userLast); // removes funds from user to purchase ticket.
+                    queries.subtractFunds(server, userFirst, userLast); // removes funds from user to purchase ticket.
                     queries.incrementPoints(server, userFirst, userLast); //Adds 1 reward point to the user for buying a ticket.
                     validFunds = true;
                 }
@@ -637,26 +611,23 @@ public class MovieTheater
     // Returns a list of all valid users first, and last names)
     public static ResultSet getAllUsers(Connection server)
     {
+        ResultSet results = null;
         try
         {
-            return (queries.getUsers(server));
-        }
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
+            results =  (queries.getUsers(server));
         }
         catch (Exception exc)
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
         }
+        return results;
     }
 
     //Prints out all current users on the database
     public static void printUsers(Connection server)
     {
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getAllUsers(server);
@@ -701,7 +672,7 @@ public class MovieTheater
     //Checks if the user is in the database
     public static boolean checkUser(Connection server, String name)
     {
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getAllUsers(server);
@@ -712,7 +683,6 @@ public class MovieTheater
                     return true;
                 }
             }
-            return false;
         }
         catch(SQLException sqlexc)
         {
@@ -741,12 +711,13 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return false;
     }
 
     //Prints the user rewards points for the user queried
     public static void printUserRewards(Connection server, String first, String last)
     {
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getUserRewards(server, first, last);
@@ -792,26 +763,23 @@ public class MovieTheater
     //Returns the user's reward points based on first,last and birthday.
     public static ResultSet getUserRewards(Connection server, String first, String last)
     {
+        ResultSet results= null;
         try
         {
-            return (queries.getRewards(server,first,last));
-        }
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
+            results = queries.getRewards(server,first,last);
         }
         catch (Exception exc)
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
         }
+        return results;
     }
 
     // Prints out all the showtimes for the selected movie 
     public static void printShowtimes(Connection server, String movie)
     {
-        ResultSet results;
+        ResultSet results = null;
         int size = 0;
         try
         {
@@ -868,7 +836,8 @@ public class MovieTheater
     //checks if the showtime entered is a valid choice
     public static boolean checkShowtime(Connection server, String movie, String time)
     {
-        ResultSet results;
+        ResultSet results = null;
+        boolean toRet =false;
         try
         {
             results = getShowtimes(server, movie);
@@ -876,10 +845,9 @@ public class MovieTheater
             {
                 if (time.equalsIgnoreCase(results.getString(1)))
                 {
-                    return true;
+                    toRet = true;
                 }
             }
-            return false;
         }
         catch(SQLException sqlexc)
         {
@@ -911,34 +879,32 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return toRet;
     }
 
 
     //gets the showtimes of the user requested movie
     public static ResultSet getShowtimes(Connection server, String movie)
     {
+        ResultSet results = null;
         try
         {
             if (checkMovie(server, movie))
             {
-                return queries.getShowtimes(server,movie);
+                results =  queries.getShowtimes(server,movie);
             }
-        }
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
         }
         catch (Exception exc)
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
         }
+        return results;
     }
     // Prints out all movies on the database.
     public static void printMovies(Connection server)
     {
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getAvailableMovies(server);
@@ -983,26 +949,44 @@ public class MovieTheater
     //Returns the result set of all movies titles on the database.
     public static ResultSet getAvailableMovies(Connection server)
     {
+        ResultSet results = null;
         try
         {
-            return (queries.getMovieTitles(server));
-        }
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
+            results = (queries.getMovieTitles(server));
         }
         catch (Exception exc)
         {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
         }
+        finally
+        {
+            try
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            catch(SQLException sqlexc)
+            {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            }
+            catch (Exception exc)
+            {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
+        }
+        return results;
     }
 
     //Checks if the selected movie is in the database. Uses the connection to the SQL server to check.
     public static boolean checkMovie(Connection server, String movie)
     {
-        ResultSet results;
+        ResultSet results = null;
+        boolean toRet = false;
         try
         {
             results = getAvailableMovies(server);
@@ -1010,8 +994,7 @@ public class MovieTheater
             {
                 if(results.getString(1).equalsIgnoreCase(movie))
                 {
-                    return true;
-                    break;
+                    toRet = true;
                 }
             }
             return false;
@@ -1046,6 +1029,7 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return toRet;
     }
 
 /////////ALL SEATS ARE ASSUMING THE SEAT NUMBERS WILL BE INTS if not we need to change it!!!
@@ -1053,7 +1037,7 @@ public class MovieTheater
     //prints out all available seats
     public static void printSeats(Connection server, String movie, String showtime)
     {
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getSeats(server,movie,showtime);
@@ -1097,7 +1081,8 @@ public class MovieTheater
     //checks if the seat selected is a valid choice
     public static boolean checkSeat(Connection server, String movie, String showtime, Integer seat)
     {
-        ResultSet results;
+        ResultSet results = null;
+        boolean toRet = false;
         try
         {
             results = getSeats(server,movie,showtime);
@@ -1105,8 +1090,7 @@ public class MovieTheater
             {
                 if(results.getInt(1) == seat)
                 {
-                    return true;
-                    break;
+                   toRet = true;
                 }
             }
             return false;
@@ -1141,32 +1125,50 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return toRet;
     }
 
     //gets all available seats for the selected movie and showtime. where the userId is Null
     public static ResultSet getSeats(Connection server, String movie, String showtime)
     {
+        ResultSet results = null;
         try
             {
-                return (queries.getSeats(server,movie,showtime));
-            }
-            catch(SQLException sqlexc)
-            {
-                sqlexc.printStackTrace();
-                System.out.println("A SQL error occurred. Please see error to help solve.");
+                results = (queries.getSeats(server,movie,showtime));
             }
             catch (Exception exc)
             {
                 exc.printStackTrace();
                 System.out.println("An error occurred. Please see error to help solve.");
             }
+            finally
+            {
+                try
+                {
+                    if (results != null)
+                    {
+                        results.close();
+                    }
+                }
+                catch(SQLException sqlexc)
+                {
+                    sqlexc.printStackTrace();
+                    System.out.println("A SQL error occurred. Please see error to help solve.");
+                }
+                catch (Exception exc)
+                {
+                    exc.printStackTrace();
+                    System.out.println("An error occurred. Please see error to help solve.");
+                }
+            }
+            return results;
     }
 
     //Generates a random 5 didgit number for userID and checks that it is not already used. If it is then it will re-generate a new number and check again.
     public static int generateUserId(Connection server)
     {
-        ResultSet results;
-        Integer randId;
+        ResultSet results = null;
+        Integer randId=00000;
         boolean valid = false, match = false;
         try
         {
@@ -1193,7 +1195,6 @@ public class MovieTheater
                     }
                 }
             }
-            return randId;
         }
         catch(SQLException sqlexc)
         {
@@ -1225,12 +1226,13 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return randId;
     }
     //Generates a random 5 didgit number for filmID and checks that it is not already used. If it is then it will re-generate a new number and check again.
     public static int generateFilmId(Connection server)
     {
-        ResultSet results;
-        Integer randId;
+        ResultSet results = null;
+        Integer randId = 00000;
         boolean valid = false, match = false;
         try
         {
@@ -1257,7 +1259,6 @@ public class MovieTheater
                     }
                 }
             }
-            return randId;
         }
         catch(SQLException sqlexc)
         {
@@ -1289,11 +1290,12 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
+        return randId;
     }
         //Prints out all the movies that the user has a ticket for.
     public static void printUserTickets(Connection server, String userFirst, String userLast)
     {
-        ResultSet results;
+        ResultSet results = null;
         int count = 0;
         try
         {
@@ -1344,15 +1346,14 @@ public class MovieTheater
     public static int countMovies(Connection server)
     {
         Integer count = 0;
-        ResultSet results;
+        ResultSet results = null;
         try
         {
             results = getAvailableMovies(server);
             while (results.next())
             {
                 count++;
-            }
-            return count;
+            }        
         }
         catch(SQLException sqlexc)
         {
@@ -1384,7 +1385,7 @@ public class MovieTheater
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
-
+        return count;
     }
 
 }

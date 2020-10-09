@@ -17,7 +17,7 @@ public class MovieTheater
 {
     private static Connection server;
     private static Scanner input = new Scanner (System.in);
-    static Queries queries = new Queries();
+    private static Queries queries = new Queries();
 
     public MovieTheater()
     {

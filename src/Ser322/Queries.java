@@ -1,7 +1,7 @@
 package ser322;
 
 import java.sql.*;
-import java.sql.Date;
+
 
 /* SER322 Fall 2020 Session A
  *   @Author: David Aldridge, Curtis Kovacs, Christopher Lopez, David Lacombe
@@ -635,11 +635,11 @@ public class Queries{
     }
 
     //insert user
-    public int insertUser(Connection s, int id, String first, String last, Date bday, double funds, int points){
+    public int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds, Integer points){
         Statement stmt = null;
         int success = 0;
         try{
-            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + bday.toString() +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
+            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + bday +  ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
             System.out.println("SQL statement to be inserted: " + sql);
             stmt = s.createStatement();
             success = stmt.executeUpdate(sql);

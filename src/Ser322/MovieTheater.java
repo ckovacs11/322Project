@@ -1,6 +1,5 @@
 package ser322;
 
-import java.io.*;
 import java.util.*;
 import java.sql.*;
 import java.sql.Date;
@@ -387,8 +386,8 @@ public class MovieTheater
     */
     public static void addUser(Connection server)
     {
-        String userInput, newUserFirst, newUserLast, birthday;
-        Integer userFunds, userRewards, userIntInput, userId;
+        String userInput="", newUserFirst="", newUserLast="", birthday="";
+        Integer userFunds=0, userRewards=0, userIntInput=0, userId=0;
         Boolean valid = false;
         while(!valid)
         {
@@ -458,7 +457,7 @@ public class MovieTheater
             }
         }
         userId = generateUserId(server);
-        queries.insertUser(userId,newUserFirst,newUserLast,birthday,userFunds,userRewards);
+        queries.insertUser(server,userId,newUserFirst,newUserLast,birthday,userFunds,userRewards);
         System.out.println("Successfully added "+ newUserFirst + " " + newUserLast);
     }
     /*
@@ -467,9 +466,9 @@ public class MovieTheater
     */
     private static void buyTicket(Connection server)
     {
-        String userInput="", movieChoice= "", showtimeChoice="", seatChoice="", userFirst="",userLast="";
+        String userInput="", movieChoice= "", showtimeChoice="", userFirst="",userLast="";
         ResultSet results = null;
-        Integer userIntput=-1;
+        Integer userIntput=-1, seatChoice = 0;
         boolean validMovie = false, validTime = false, validSeat =false, validUser = false, validFunds = false ;
         try
         {
@@ -527,7 +526,7 @@ public class MovieTheater
                     if(checkSeat(server, movieChoice, showtimeChoice, Integer.parseInt(userInput)))
                     {
                         validSeat = true;
-                        seatChoice = Integer.toString(userIntput);
+                        seatChoice = userIntput;
                         break;
                     }
                 }
@@ -547,21 +546,19 @@ public class MovieTheater
                 }
                 else
                 {
-                    while (results.next())
+                    if(checkUser(server, userInput))
                     {
-                        if(userInput.equalsIgnoreCase(results.getString(1) +" " + results.getString(2)))
-                        {
-                            validUser = true;
-                            userFirst = results.getString(1);
-                            userLast = results.getString(2);
-                            break;
-                        }
+                        validUser = true;
+                        String[] splited = userInput.split("\\s+");
+                        userFirst = splited[0];
+                        userLast = splited[1];
+                        break;
                     }
-                    if(!validUser)
-                    {
-                        System.out.println("That user's name was not found.\n Please check the list of users below.\nIf we have an error in your name please contact your system Admin...\n");
-                        printUsers(server);                                         
-                    }
+                }
+                if(!validUser)
+                {
+                    System.out.println("That user's name was not found.\n Please check the list of users below.\nIf we have an error in your name please contact your system Admin...\n");
+                    printUsers(server);                                         
                 }
             }
             results = queries.getUserInfo(server,userFirst,userLast); //Return the funds, rewards points and birthday of user

@@ -1,5 +1,6 @@
 package ser322;
 
+import java.io.*;
 import java.util.*;
 import java.sql.*;
 import java.sql.Date;
@@ -50,7 +51,7 @@ public class MovieTheater {
         String mainMen = "\nHello,\n Please select from the following options: \n\n1. Check available Movies.\n";
         mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
         mainMen = mainMen
-                + "\n5. Add movie.\n6. Delete Movie. \n7.Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
+                + "\n5. Add movie.\n6. Delete Movie. \n7. Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
         mainMen = mainMen + "9. Add user.\n10. Delete user.\n11. Exit.\n";
         while (selection != -1) {
             System.out.println(mainMen);
@@ -113,6 +114,8 @@ public class MovieTheater {
                     }
                     case 11: {
                         selection = -1;
+                        input.close();
+                        System.exit(1);
                         break;
                     }
                     default: {
@@ -130,14 +133,14 @@ public class MovieTheater {
     public static void findRewards(Connection server) {
         String userInput, userFirst = "", userLast = "";
         boolean valid = false;
-
+        input.nextLine();
         while (!valid) {
             System.out.println(
                     "Please enter the name of the user you wish to see the current reward points for:\n Ex: \'Pointer McGee\'");
             userInput = input.nextLine();
             if (checkUser(server, userInput)) {
                 valid = true;
-                String[] splited = userInput.split(" "");
+                String[] splited = userInput.split(" ");
                 userFirst = splited[0];
                 userLast = splited[1];
             } else {
@@ -154,6 +157,7 @@ public class MovieTheater {
         String userInput, movieName = "", userFirst = "", userLast = "";
         boolean valid = false;
         System.out.println("NOTICE all tickets are non refundable, so canceling a ticket will not incurr a refund.\n");
+        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the user who has the ticket to be canceled: Ex: Bob Tob");
             userInput = input.nextLine();
@@ -195,9 +199,11 @@ public class MovieTheater {
         String userInput = "", movieName = "", movieRating = "";
         Integer movieRuntime = 0, movieId = 0, userINTput = 0;
         boolean valid = false;
+        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the movie you wish to add:");
             userInput = input.nextLine();
+            System.out.println(userInput + checkMovie(server, userInput));
             if (!checkMovie(server, userInput)) // We want the movie to not be found.
             {
                 valid = true;
@@ -244,7 +250,7 @@ public class MovieTheater {
     public static void deleteMovie(Connection server) {
         String userInput = "";
         boolean valid = false;
-
+        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the movie you wish to delete:");
             userInput = input.nextLine();
@@ -275,6 +281,7 @@ public class MovieTheater {
     public static void getShowtime(Connection server) {
         String userInput = "";
         boolean valid = false;
+        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the movie you wish to check the showtimes for:\n");
             userInput = input.nextLine();
@@ -295,6 +302,7 @@ public class MovieTheater {
     public static void deleteUser(Connection server) {
         String userInput = "", userFirst = "", userLast = "";
         boolean valid = false;
+        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the Rewards user you wish to remove: Ex:\"Tom Tim\"\n");
             userInput = input.nextLine();
@@ -326,6 +334,7 @@ public class MovieTheater {
         String userInput = "", newUserFirst = "", newUserLast = "", birthday = "";
         Integer userFunds = 0, userRewards = 0, userIntInput = 0, userId = 0;
         Boolean valid = false;
+        input.nextLine();
         while (!valid) {
             System.out.println(
                     "Please enter the First and Last name of the new user you wish to add:(Separted by a space)\n Ex: Tim Tom");
@@ -335,7 +344,7 @@ public class MovieTheater {
                 return; // exits the addUser method back to the main menu
             }
 
-            if (checkUser(server, userInput) == false) // return of false means the user was not found.
+            if (!checkUser(server, userInput)) // return of false means the user was not found.
             {
                 valid = true;
                 String[] splited = userInput.split(" ");
@@ -404,6 +413,7 @@ public class MovieTheater {
         PreparedStatement ps = null, pstmt = null;
         int success = 0, userID = 0;
         try {
+            input.nextLine();
             while (!validMovie) {
                 System.out.println(
                         "Please enter the name of the movie you wish to buy a ticket for:\n(If you need to see available movies type \"Movies\".\n");
@@ -427,7 +437,7 @@ public class MovieTheater {
                 if (userInput.equalsIgnoreCase("times")) {
                     printShowtimes(server, movieChoice);
                 } else {
-                    if (checkShowtime(server, movieChoice, userInput)) {
+                    if (checkShowtime(server, movieChoice, userInput+":00")) {
                         validTime = true;
                         showtimeChoice = userInput;
                         break;
@@ -860,7 +870,6 @@ public class MovieTheater {
     public static boolean checkMovie(Connection server, String movie) {
         ResultSet results = null;
         boolean toRet = false;
-        Statement stmt = null;
         try {
 
             PreparedStatement ps = server.prepareStatement("SELECT Title FROM film WHERE Title=?");

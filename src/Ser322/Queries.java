@@ -373,7 +373,7 @@ public class Queries {
         }
         return success;
     }
-
+/*
     // Gets user funds
     public ResultSet getFunds(Connection server, String first, String last) {
         PreparedStatement ps = null;
@@ -399,6 +399,5 @@ public class Queries {
                 se.printStackTrace();
             }
         }
-        return rs;
+        return rs;*/
     }
-}

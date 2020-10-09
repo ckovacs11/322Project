@@ -863,14 +863,16 @@ public class MovieTheater {
         Statement stmt = null;
         try {
 
-            stmt = server.createStatement();
-            results = stmt.executeQuery("SELECT Title FROM film");
+            PreparedStatement ps = server.prepareStatement("SELECT Title FROM film WHERE Title=?");
+            ps.setString(1, movie);
+            results = ps.executeQuery();
+
             while (results.next()) {
                 if (results.getString(1).equalsIgnoreCase(movie)) {
+
                     toRet = true;
                 }
             }
-            return false;
         } catch (SQLException sqlexc) {
             sqlexc.printStackTrace();
             System.out.println("A SQL error occurred. Please see error to help solve.");

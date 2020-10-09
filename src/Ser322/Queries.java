@@ -111,7 +111,7 @@ public class Queries{
         try{
 		stmt = s.createStatement();
         rs = stmt.executeQuery("SELECT Title FROM film");
-		return rs;
+
        }catch(SQLException se){
             se.printStackTrace();
             System.out.println("Error occurred when getting movie titles.");
@@ -137,7 +137,7 @@ public class Queries{
                 se.printStackTrace();
             }
         }
-		
+        return rs;
 	}
 
     //returns the showtimes for the given movie

@@ -47,10 +47,10 @@ public class MovieTheater {
 
     private static void mainMenu(Connection server) {
         Integer selection = 0;
-        String mainMen = "Hello,\n Please select from the following options: \n\n1. Check available Movies.\n";
+        String mainMen = "\nHello,\n Please select from the following options: \n\n1. Check available Movies.\n";
         mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
         mainMen = mainMen
-                + "5. Add movie.\n6. Delete Movie. \n7.Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
+                + "\n5. Add movie.\n6. Delete Movie. \n7.Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
         mainMen = mainMen + "9. Add user.\n10. Delete user.\n11. Exit.\n";
         while (selection != -1) {
             System.out.println(mainMen);
@@ -122,7 +122,6 @@ public class MovieTheater {
                     }
                 }
             }
-            System.out.println(mainMen);
         }
 
     }
@@ -138,7 +137,7 @@ public class MovieTheater {
             userInput = input.nextLine();
             if (checkUser(server, userInput)) {
                 valid = true;
-                String[] splited = userInput.split("\\s+");
+                String[] splited = userInput.split(" "");
                 userFirst = splited[0];
                 userLast = splited[1];
             } else {
@@ -160,7 +159,7 @@ public class MovieTheater {
             userInput = input.nextLine();
             if (checkUser(server, userInput)) {
                 valid = true;
-                String[] splited = userInput.split("\\s+");
+                String[] splited = userInput.split(" ");
                 userFirst = splited[0];
                 userLast = splited[1];
             } else {
@@ -311,7 +310,7 @@ public class MovieTheater {
                 System.out.println("If you no longer wish to delete a user, please type \'Cancel\'");
             }
         }
-        String[] splited = userInput.split("\\s+");
+        String[] splited = userInput.split(" ");
         userFirst = splited[0];
         userLast = splited[1];
         deleteUsers(server, userFirst, userLast);
@@ -336,10 +335,10 @@ public class MovieTheater {
                 return; // exits the addUser method back to the main menu
             }
 
-            if (!checkUser(server, userInput)) // return of false means the user was not found.
+            if (checkUser(server, userInput) == false) // return of false means the user was not found.
             {
                 valid = true;
-                String[] splited = userInput.split("\\s+");
+                String[] splited = userInput.split(" ");
                 newUserFirst = splited[0];
                 newUserLast = splited[1];
             } else {
@@ -472,7 +471,7 @@ public class MovieTheater {
                 } else {
                     if (checkUser(server, userInput)) {
                         validUser = true;
-                        String[] splited = userInput.split("\\s+");
+                        String[] splited = userInput.split(" ");
                         userFirst = splited[0];
                         userLast = splited[1];
                         break;
@@ -619,7 +618,7 @@ public class MovieTheater {
             results = stmt.executeQuery("SELECT * FROM user");
             System.out.println("List of Current users:\n");
             while (results.next()) {
-                System.out.println(results.getString(1) + " " + results.getString(2));
+                System.out.println(results.getString(2) + " " + results.getString(3));
             }
         } catch (SQLException sqlexc) {
             sqlexc.printStackTrace();
@@ -649,12 +648,13 @@ public class MovieTheater {
     public static boolean checkUser(Connection server, String name) {
         ResultSet results = null;
         Statement stmt = null;
+        boolean toRet= false;
         try {
             stmt = server.createStatement();
             results = stmt.executeQuery("SELECT * FROM user");
             while (results.next()) {
                 if (name.equalsIgnoreCase(results.getString(1) + " " + results.getString(2))) {
-                    return true;
+                    toRet = true;
                 }
             }
         } catch (SQLException sqlexc) {
@@ -679,7 +679,7 @@ public class MovieTheater {
                 System.out.println("An error occurred. Please see error to help solve.");
             }
         }
-        return false;
+        return toRet;
     }
 
     // Prints the user rewards points for the user queried

@@ -1285,17 +1285,19 @@ public class MovieTheater {
     }
 
     // insert user
-    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds,
-            Integer points) {
+    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds, Integer points) {
         Statement stmt = null;
         int success = 0;
         try {
-            String sql = "INSERT INTO user VALUES (" + Integer.toString(id) + ", " + first + ", " + last + ", " + bday
-                    + ", " + Double.toString(funds) + ", " + Integer.toString(points) + ")";
-            System.out.println("SQL statement to be inserted: " + sql);
-            stmt = s.createStatement();
-            success = stmt.executeUpdate(sql);
-            if (success > 0) {
+            PreparedStatement ps = s.prepareStatement("INSERT INTO user (User_ID, First_Name, Last_Name, Birthday, Funds, Reward_Points) VALUES (?,?,?,?,?,?)");
+            ps.setInt(1, id);
+            ps.setString(2, first);
+            ps.setString(3, last);
+            ps.setString(4, bday);
+            ps.setInt(5, funds);
+            ps.setInt(6, points);
+            int rs = ps.executeUpdate();
+            if (rs > 0) {
                 System.out.println("User successfully added");
             } else {
                 System.out.println("User not added. Check SQL statement.");

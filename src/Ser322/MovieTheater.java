@@ -520,7 +520,7 @@ public class MovieTheater {
                 userID = getUserId(server, userFirst, userLast);
 
                 // reserve seat
-                success = reserveSeat(server, userID, movieChoice, showtimeChoice, seatChoice);
+                success = reserveSeat(server, userID, seatChoice);
                 if (success > 0) {
                     System.out.println("Seat successfully reserved");
                 } else {
@@ -1476,18 +1476,16 @@ public class MovieTheater {
     return toRet;
     }
 
-    public static Integer reserveSeat(Connection server, Integer userID, String movieChoice, String showtimeChoice, Integer seatChoice)
+    public static Integer reserveSeat(Connection server, Integer userID, Integer seatChoice)
     {
         PreparedStatement ps = null;
         Integer success = 0;
         try
         {
             ps = server.prepareStatement(
-            "UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
+            "UPDATE seat_showtime SET User_ID = ? WHERE Seat_ID =?");
             ps.setInt(1, userID);
-            ps.setString(2, movieChoice);
-            ps.setString(3, showtimeChoice);
-            ps.setInt(4, seatChoice);
+            ps.setInt(2, seatChoice);
             success = ps.executeUpdate();
     }
         catch (SQLException se) {

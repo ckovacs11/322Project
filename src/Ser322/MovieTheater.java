@@ -955,7 +955,6 @@ public class MovieTheater {
                     toRet = true;
                 }
             }
-            return false;
         } catch (SQLException sqlexc) {
             sqlexc.printStackTrace();
             System.out.println("A SQL error occurred. Please see error to help solve.");

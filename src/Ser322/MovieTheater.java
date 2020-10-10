@@ -2,7 +2,6 @@ package ser322;
 
 import java.util.*;
 import java.sql.*;
-import java.sql.Date;
 
 /* SER322 Fall 2020 Session A
  *   @Author: David Aldridge, Curtis Kovacs, Christopher Lopez, David Lacombe
@@ -405,12 +404,10 @@ public class MovieTheater {
      */
     private static void buyTicket(Connection server) {
         String userInput = "", movieChoice = "", showtimeChoice = "", userFirst = "", userLast = "";
-        ResultSet results = null;
         Integer userIntput = -1, seatChoice = 0;
         boolean validMovie = false, validTime = false, validSeat = false, validUser = false, validFunds = false;
-        PreparedStatement ps = null, pstmt = null;
         int success = 0, userID = 0;
-        try {
+       
             input.nextLine();
             while (!validMovie) {
                 System.out.println(
@@ -520,23 +517,10 @@ public class MovieTheater {
                     break;
                 }
 
-                pstmt = server.prepareStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
-                pstmt.setString(1, userFirst);
-                pstmt.setString(2, userLast);
-                results = pstmt.executeQuery();
-
-                while (results.next()) {
-                    userID = results.getInt(1);
-                }
+                userID = getUserId(server, userFirst, userLast);
 
                 // reserve seat
-                ps = server.prepareStatement(
-                        "UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
-                ps.setInt(1, userID);
-                ps.setString(2, movieChoice);
-                ps.setString(3, showtimeChoice);
-                ps.setInt(4, seatChoice);
-                success = ps.executeUpdate();
+                success = reserveSeat(server, userID, movieChoice, showtimeChoice, seatChoice);
                 if (success > 0) {
                     System.out.println("Seat successfully reserved");
                 } else {
@@ -545,33 +529,9 @@ public class MovieTheater {
                 System.out.println("Enjoy your movie, and dont forget the popcorn!");
             }
 
-        } catch (SQLException sqlexc) {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        } finally {
-            try {
-                if (results != null) {
-                    results.close();
-                }
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException sqlexc) {
-                sqlexc.printStackTrace();
-                System.out.println("A SQL error occurred. Please see error to help solve.");
-            } catch (Exception exc) {
-                exc.printStackTrace();
-                System.out.println("An error occurred. Please see error to help solve.");
-            }
+        
         }
-    }
+    
 
     // Returns a list of all valid users first, and last names)
     public static ResultSet getAllUsers(Connection server) {
@@ -1515,5 +1475,43 @@ public class MovieTheater {
         }
     return toRet;
     }
+
+    public static Integer reserveSeat(Connection server, Integer userID, String movieChoice, String showtimeChoice, Integer seatChoice)
+    {
+        PreparedStatement ps = null;
+        Integer success = 0;
+        try
+        {
+            ps = server.prepareStatement(
+            "UPDATE seat_showtime SET User_ID = ? JOIN showtime ON seat_showtime.Showtime_ID = showtime.Showtime_ID JOIN film_showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =? AND time=? AND Seat_ID =?");
+            ps.setInt(1, userID);
+            ps.setString(2, movieChoice);
+            ps.setString(3, showtimeChoice);
+            ps.setInt(4, seatChoice);
+            success = ps.executeUpdate();
+    }
+        catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } 
+        catch (Exception exc) 
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } 
+        finally 
+        {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            }
+            catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+        return success;
+    }
+
 
 }

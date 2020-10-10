@@ -470,6 +470,7 @@ public class MovieTheater {
                     printSeats(server, movieChoice, showtimeChoice);
                 }
             }
+            input.nextLine();
             while (!validUser) {
                 System.out.printf(
                         "To purchase this ticket for %s at %s in seat:%s%nnPlease enter your full name. %nNOTE: you must already be registered to purchase a ticket. If you need to check if you are registered then type \"Users\"%n",

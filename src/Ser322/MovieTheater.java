@@ -495,51 +495,26 @@ public class MovieTheater {
             }
 
             while (!validFunds) {
-                if (getFunds(server, userFirst, userLast)>5) {
+                if (getRewards(server, userFirst, userLast)>9) {
                     System.out.printf("Using rewards points for 1 ticket for %s%nAt:%s%nSeat:%s%n", movieChoice,
                             showtimeChoice, seatChoice);
                     // QUERY to UPDATE REWARDS POINTS FOR buying ticket -10
                     // (server,userFirst,UserLast,newpoint value)
-                    updatePoints(server, userFirst, userLast);
+                    usePoints(server, userFirst, userLast);
                     validFunds = true;
-                } else if (getRewards(server, userFirst, userLast) > 9) {
+                } 
+                else if (getFunds(server, userFirst, userLast) > 4) 
+                {
                     System.out.printf("Purchasing 1 ticket for %s%nAt:%s%nSeat:%s%n", movieChoice, showtimeChoice,
                             seatChoice);
-
                     // removes funds from user to purchase ticket.
-                    double funds = 0;
-                    ps = server.prepareStatement("SELECT Funds from user WHERE First_Name=? AND Last_Name=?");
-                    ps.setString(1, userFirst);
-                    ps.setString(2, userLast);
-                    ResultSet rs = ps.executeQuery();
-                    while (results.next()) {
-                        funds = results.getDouble(1) - 5;
-                    }
-
-                    pstmt = server.prepareStatement("UPDATE user SET Funds =? WHERE First_Name =? AND Last_Name=?");
-                    pstmt.setDouble(1, funds);
-                    pstmt.setString(2, userFirst);
-                    pstmt.setString(3, userLast);
-                    pstmt.executeUpdate();
-
+                    useFunds(server, userFirst, userLast);
+                    
                     // Adds 1 reward point to the user for buying a ticket.
-                    int new_points = 0;
-                    ps = server.prepareStatement("SELECT Reward_Points from user WHERE First_Name=? AND Last_Name=?");
-                    ps.setString(1, userFirst);
-                    ps.setString(2, userLast);
-                    results = ps.executeQuery();
-                    while (results.next()) {
-                        new_points = results.getInt(1) + 1;
-                    }
+                    updatePoints(server, userFirst, userLast);
+                }
 
-                    pstmt = server
-                            .prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
-                    pstmt.setInt(1, new_points);
-                    pstmt.setString(2, userFirst);
-                    pstmt.setString(3, userLast);
-                    pstmt.executeUpdate();
-                    validFunds = true;
-                } else {
+                    else {
                     System.out.println(
                             "You do not have enough funds in your account.\n Please vist the ticket window or atm to add funds.\n Thank you.");
                     break;
@@ -1372,6 +1347,63 @@ public class MovieTheater {
         return rowAffected;
 
     }
+    public static int usePoints(Connection s, String first, String last) {
+        PreparedStatement ps = null;
+        int rowAffected = 0;
+        try {
+            ps = s.prepareStatement("UPDATE user SET Reward_Points = Reward_Points - 10 WHERE First_Name =? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            rowAffected = ps.executeUpdate();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+
+        return rowAffected;
+
+    }
+
+    public static int useFunds(Connection s, String first, String last) {
+        PreparedStatement ps = null;
+        int rowAffected = 0;
+        try {
+            ps = s.prepareStatement("UPDATE user SET Funds = Funds - 5 WHERE First_Name =? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            rowAffected = ps.executeUpdate();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+
+        return rowAffected;
+
+    }
 
     public static int getFunds (Connection server, String first, String last)
     {
@@ -1418,6 +1450,43 @@ public class MovieTheater {
         try
         {
             ps = server.prepareStatement("Select u.Reward_Points from user u where u.First_Name = ? and u.Last_Name = ?");
+            ps.setString(1, first);
+            ps.setString(2, last);
+            results = ps.executeQuery();
+            while (results.next())
+            {
+                toRet = results.getInt(1);
+            }
+        }
+        catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } catch (Exception exc) 
+        {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } 
+        finally 
+        {
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        }
+    return toRet;
+    }
+
+    public static int getUserId(Connection server, String first, String last)
+    {
+        PreparedStatement ps = null;
+        ResultSet results = null;
+        Integer toRet = 0;
+        try
+        {
+            ps = server.prepareStatement("Select u.User_Id from user u where u.First_Name = ? and u.Last_Name = ?");
             ps.setString(1, first);
             ps.setString(2, last);
             results = ps.executeQuery();

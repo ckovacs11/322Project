@@ -508,6 +508,7 @@ public class MovieTheater {
                             showtimeChoice, seatChoice);
                     // QUERY to UPDATE REWARDS POINTS FOR buying ticket -10
                     // (server,userFirst,UserLast,newpoint value)
+                    updatePoints(server, userFirst, userLast);
                     validFunds = true;
                 } else if (results.getInt(1) > 9) {
                     System.out.printf("Purchasing 1 ticket for %s%nAt:%s%nSeat:%s%n", movieChoice, showtimeChoice,
@@ -539,7 +540,8 @@ public class MovieTheater {
                         new_points = results.getInt(1) + 1;
                     }
 
-                    pstmt = server.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+                    pstmt = server
+                            .prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
                     pstmt.setInt(1, new_points);
                     pstmt.setString(2, userFirst);
                     pstmt.setString(3, userLast);
@@ -657,7 +659,7 @@ public class MovieTheater {
     public static boolean checkUser(Connection server, String name) {
         ResultSet results = null;
         Statement stmt = null;
-        boolean toRet= false;
+        boolean toRet = false;
         try {
             stmt = server.createStatement();
             results = stmt.executeQuery("SELECT First_Name, Last_Name FROM user");
@@ -736,7 +738,8 @@ public class MovieTheater {
         PreparedStatement ps = null;
         try {
             if (checkMovie(server, movie)) {
-                ps = server.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+                ps = server.prepareStatement(
+                        "SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
                 ps.setString(1, movie);
                 results = ps.executeQuery();
                 System.out.println("The showtimes for " + movie + " are:");
@@ -782,7 +785,8 @@ public class MovieTheater {
         PreparedStatement ps = null;
         try {
             if (checkMovie(server, movie)) {
-                ps = server.prepareStatement("SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
+                ps = server.prepareStatement(
+                        "SELECT Time FROM film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON film_showtime.Showtime_ID = showtime.Showtime_ID WHERE title =?");
                 ps.setString(1, movie);
                 results = ps.executeQuery();
             }
@@ -817,50 +821,40 @@ public class MovieTheater {
     }
 
     // Prints out all movies on the database.
-    public static void printMovies(Connection server)
-    {
+    public static void printMovies(Connection server) {
         ResultSet results = null;
         Statement stmt = null;
-        try
-        {
+        try {
 
-          stmt = server.createStatement();
-          results = stmt.executeQuery("SELECT Title FROM film");
-        System.out.println("Current Movies:");
-          while(results.next())
-          {
-              System.out.println(results.getString(1));
-          }
-        }
-
-        catch(SQLException sqlexc)
-        {
-            sqlexc.printStackTrace();
-            System.out.println("A SQL error occurred. Please see error to help solve.");
-        }
-        catch (Exception exc)
-        {
-            exc.printStackTrace();
-            System.out.println("An error occurred. Please see error to help solve.");
-        }
-        finally {
-            try {
-                if (results != null)
-                {
-                    results.close();
-                }
-                if(stmt!=null){
-                    stmt.close();
+            stmt = server.createStatement();
+            results = stmt.executeQuery("SELECT Title FROM film");
+            System.out.println("Current Movies:");
+            while (results.next()) {
+                System.out.println(results.getString(1));
             }
         }
-        catch(SQLException sqlexc) {
+
+        catch (SQLException sqlexc) {
             sqlexc.printStackTrace();
             System.out.println("A SQL error occurred. Please see error to help solve.");
-        }
-        catch (Exception exc) {
+        } catch (Exception exc) {
             exc.printStackTrace();
             System.out.println("An error occurred. Please see error to help solve.");
-        }
+        } finally {
+            try {
+                if (results != null) {
+                    results.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException sqlexc) {
+                sqlexc.printStackTrace();
+                System.out.println("A SQL error occurred. Please see error to help solve.");
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                System.out.println("An error occurred. Please see error to help solve.");
+            }
         }
     }
 
@@ -911,8 +905,9 @@ public class MovieTheater {
         ResultSet results = null;
         PreparedStatement ps = null;
         try {
-            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE Time =? AND Title =? AND User_ID = null");
-            ps.setString(1, showtime+":00");
+            ps = server.prepareStatement(
+                    "SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE Time =? AND Title =? AND User_ID = null");
+            ps.setString(1, showtime + ":00");
             ps.setString(2, movie);
             results = ps.executeQuery();
             System.out.println("The available seats for " + movie + " at " + showtime + " are:");
@@ -950,7 +945,8 @@ public class MovieTheater {
         PreparedStatement ps = null;
         boolean toRet = false;
         try {
-            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
+            ps = server.prepareStatement(
+                    "SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
             ps.setString(1, showtime);
             ps.setString(2, movie);
             results = ps.executeQuery();
@@ -1101,7 +1097,8 @@ public class MovieTheater {
             rs = pstmt.executeQuery();
             int userID = rs.getInt("User_ID");
 
-            ps = server.prepareStatement("SELECT f.Title FROM Film f, Seat_Showtime ss, Film_Showtime fs WHERE fs.Film_ID = f.Film_ID and fs.Showtime_ID = ss.Showtime_ID and ss.user_ID = ?");
+            ps = server.prepareStatement(
+                    "SELECT f.Title FROM Film f, Seat_Showtime ss, Film_Showtime fs WHERE fs.Film_ID = f.Film_ID and fs.Showtime_ID = ss.Showtime_ID and ss.user_ID = ?");
             ps.setInt(1, userID);
             results = ps.executeQuery();
             System.out.println(userFirst + " " + userLast + " has tickets to:");
@@ -1186,7 +1183,8 @@ public class MovieTheater {
             pstmt.setString(2, last);
             rs = pstmt.executeQuery();
 
-            ps = s.prepareStatement("UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
+            ps = s.prepareStatement(
+                    "UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
             ps.setInt(1, userID);
             ps.setString(2, title);
             success = ps.executeUpdate();
@@ -1285,11 +1283,13 @@ public class MovieTheater {
     }
 
     // insert user
-    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds, Integer points) {
+    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds,
+            Integer points) {
         Statement stmt = null;
         int success = 0;
         try {
-            PreparedStatement ps = s.prepareStatement("INSERT INTO user (User_ID, First_Name, Last_Name, Birthday, Funds, Reward_Points) VALUES (?,?,?,?,?,?)");
+            PreparedStatement ps = s.prepareStatement(
+                    "INSERT INTO user (User_ID, First_Name, Last_Name, Birthday, Funds, Reward_Points) VALUES (?,?,?,?,?,?)");
             ps.setInt(1, id);
             ps.setString(2, first);
             ps.setString(3, last);
@@ -1352,6 +1352,36 @@ public class MovieTheater {
             }
         }
         return success;
+
+    }
+
+    public static int updatePoints(Connection s, String first, String last) {
+        PreparedStatement ps = null;
+        int rowAffected = 0;
+        try {
+            ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
+            ps.setInt(1, points);
+            ps.setString(2, first);
+            ps.setString(3, last);
+            rowAffected = ps.executeUpdate();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            System.out.println("Error occurred when updating reward points.");
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            }
+        }
+
+        return rowAffected;
 
     }
 

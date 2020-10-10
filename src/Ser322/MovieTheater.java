@@ -1347,10 +1347,10 @@ public class MovieTheater {
 
         } catch (SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when updating funds.");
         } catch (Exception exc) {
             exc.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when updating funds.");
         } finally {
             try {
                 if (ps != null) {
@@ -1383,11 +1383,11 @@ public class MovieTheater {
         }
         catch (SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when getting funds.");
         } catch (Exception exc) 
         {
             exc.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when getting funds.");
         } 
         finally 
         {
@@ -1457,11 +1457,11 @@ public class MovieTheater {
         }
         catch (SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when getUserId.");
         } catch (Exception exc) 
         {
             exc.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when getUserId.");
         } 
         finally 
         {
@@ -1492,12 +1492,12 @@ public class MovieTheater {
     }
         catch (SQLException se) {
             se.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when reserving seat.");
         } 
         catch (Exception exc) 
         {
             exc.printStackTrace();
-            System.out.println("Error occurred when updating reward points.");
+            System.out.println("Error occurred when reserving seat.");
         } 
         finally 
         {

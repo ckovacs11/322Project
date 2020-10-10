@@ -301,7 +301,6 @@ public class MovieTheater {
     public static void deleteUser(Connection server) {
         String userInput = "", userFirst = "", userLast = "";
         boolean valid = false;
-        input.nextLine();
         while (!valid) {
             System.out.println("Please enter the name of the Rewards user you wish to remove: Ex:\"Tom Tim\"\n");
             userInput = input.nextLine();
@@ -661,7 +660,7 @@ public class MovieTheater {
         boolean toRet= false;
         try {
             stmt = server.createStatement();
-            results = stmt.executeQuery("SELECT * FROM user");
+            results = stmt.executeQuery("SELECT First_Name, Last_Name FROM user");
             while (results.next()) {
                 if (name.equalsIgnoreCase(results.getString(1) + " " + results.getString(2))) {
                     toRet = true;

@@ -49,8 +49,8 @@ public class MovieTheater {
         String mainMen = "\nHello,\n Please select from the following options: \n\n1. Check available Movies.\n";
         mainMen = mainMen + "2. Buy Ticket. \n3. Check showtime for certain movie.\n4. Check reward points.";
         mainMen = mainMen
-                + "\n5. Add movie.\n6. Delete Movie. \n7. Cancel a user's ticket.\n8. Get all Rewards user Names.\n";
-        mainMen = mainMen + "9. Add user.\n10. Delete user.\n11. Exit.\n";
+                + "\n5. Add movie.\n6. Delete Movie. \n7. Get all Rewards user Names.\n";
+        mainMen = mainMen + "8. Add user.\n9. Delete user.\n10. Exit.\n";
         while (selection != -1) {
             System.out.println(mainMen);
             selection = input.nextInt();
@@ -90,27 +90,22 @@ public class MovieTheater {
                         // Deletes a movie from theater. (Does it need to delete showtimes too?)
                         deleteMovie(server);
                         break;
-                    }
+                    }                   
                     case 7: {
-                        // Cancel user ticket.
-                        cancelTicket(server);
-                        break;
-                    }
-                    case 8: {
                         printUsers(server);
                         break;
                     }
-                    case 9: {
+                    case 8: {
                         // Adds a user.
                         addUser(server);
                         break;
                     }
-                    case 10: {
+                    case 9: {
                         // Deletes a user.
                         deleteUser(server);
                         break;
                     }
-                    case 11: {
+                    case 10: {
                         selection = -1;
                         input.close();
                         System.exit(1);
@@ -148,47 +143,6 @@ public class MovieTheater {
             }
         }
         printUserRewards(server, userFirst, userLast);
-    }
-
-    // Cancels a user's ticket, so the seat becomes available again.
-    public static void cancelTicket(Connection server) {
-        String userInput, movieName = "", userFirst = "", userLast = "";
-        boolean valid = false;
-        System.out.println("NOTICE all tickets are non refundable, so canceling a ticket will not incurr a refund.\n");
-        input.nextLine();
-        while (!valid) {
-            System.out.println("Please enter the name of the user who has the ticket to be canceled: Ex: Bob Tob");
-            userInput = input.nextLine();
-            if (checkUser(server, userInput)) {
-                valid = true;
-                String[] splited = userInput.split(" ");
-                userFirst = splited[0];
-                userLast = splited[1];
-            } else {
-                System.out.println("That user was not found. Please check from the list of users and try again:");
-                printUsers(server);
-            }
-        }
-        valid = false;
-        printUserTickets(server, userFirst, userLast);
-        while (!valid) {
-            System.out.println(
-                    "Please type which movie ticket to cancel.\n To return to the main menu type \'Cancel\': ");
-            userInput = input.nextLine();
-            if (userInput.equalsIgnoreCase("cancel")) {
-                System.out.println("Returning to main menu...");
-                return;
-            }
-            if (checkMovie(server, userInput)) {
-                valid = true;
-                movieName = userInput;
-            } else {
-                System.out.println("That was not a valid choice, please select from the following list:");
-                printUserTickets(server, userFirst, userLast);
-            }
-        }
-        System.out.println("Canceling " + userFirst + " " + userLast + "'s ticket to " + movieName);
-        cancelTickets(server, userFirst, userLast, movieName);
     }
 
     // Adds a movie to the theater based on user input. Will validate that the movie
@@ -1096,49 +1050,6 @@ public class MovieTheater {
             }
         }
         return count;
-    }
-
-    public static int cancelTickets(Connection s, String first, String last, String title) {
-        PreparedStatement ps = null, pstmt = null;
-        ResultSet rs = null;
-        int success = 0;
-        int userID = 0;
-        try {
-            pstmt = s.prepareStatement("SELECT User_ID from user WHERE First_Name=? AND Last_Name=?");
-            pstmt.setString(1, first);
-            pstmt.setString(2, last);
-            rs = pstmt.executeQuery();
-
-            ps = s.prepareStatement(
-                    "UPDATE seat_showtime SET User_ID = NULL JOIN film_showtime ON seat_showtime.Showtime_Id = film_showtime.Showtime_Id WHERE User_ID =? AND Title=?");
-            ps.setInt(1, userID);
-            ps.setString(2, title);
-            success = ps.executeUpdate();
-            if (success > 0) {
-                System.out.println("Ticket successfully cancelled");
-            } else {
-                System.out.println("Ticket not cancelled. Check SQL statement.");
-            }
-
-        } catch (SQLException se) {
-            se.printStackTrace();
-            System.out.println("Error occurred when cancelling ticket.");
-        } catch (Exception exc) {
-            exc.printStackTrace();
-            System.out.println("Error occurred when cancelling ticket.");
-        } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
-        }
-        return success;
     }
 
     // insert film

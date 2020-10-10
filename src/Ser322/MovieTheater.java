@@ -463,7 +463,7 @@ public class MovieTheater {
                         break;
                     }
                 }
-                if (!validSeat) {
+                if (!validSeat && userIntput != -1) {
                     System.out.printf(
                             "That was not a valid selection.%nPlease select from the available seats for %s at %s:%n",
                             movieChoice, showtimeChoice);

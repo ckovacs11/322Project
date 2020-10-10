@@ -457,7 +457,7 @@ public class MovieTheater {
                 if (userIntput.equals(-1)) {
                     printSeats(server, movieChoice, showtimeChoice);
                 } else {
-                    if (checkSeat(server, movieChoice, showtimeChoice, Integer.parseInt(userInput))) {
+                    if (checkSeat(server, movieChoice, showtimeChoice, userIntput)) {
                         validSeat = true;
                         seatChoice = userIntput;
                         break;
@@ -906,7 +906,7 @@ public class MovieTheater {
         PreparedStatement ps = null;
         try {
             ps = server.prepareStatement(
-                    "SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE Time =? AND Title =? AND User_ID is null");
+                    "SELECT ss.Seat_ID FROM seat_showtime ss, showtime s, film f, film_showtime fs WHERE ss.Showtime_ID = fs.showtime_id and s.Showtime_ID = fs.Showtime_ID and s.Time =?  AND f.Title = ? AND ss.User_ID is null And fs.Film_ID = f.Film_ID");
             ps.setString(1, showtime + ":00");
             ps.setString(2, movie);
             results = ps.executeQuery();

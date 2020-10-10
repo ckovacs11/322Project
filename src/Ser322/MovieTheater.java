@@ -421,6 +421,7 @@ public class MovieTheater {
                     printMovies(server);
                 } else {
                     validMovie = checkMovie(server, userInput);
+                    movieChoice = userInput;
                     if (!validMovie) {
                         System.out
                                 .println("That was not a valid selection.\nPlease select from this list of movies.\n");
@@ -454,7 +455,7 @@ public class MovieTheater {
                         "Which seat would you like to reserve for %s at %s? %nPlease enter the seat number:%n For a list of available seats type \"-1\"%n",
                         movieChoice, showtimeChoice);
                 userIntput = input.nextInt();
-                if (userIntput == -1) {
+                if (userIntput.equals(-1)) {
                     printSeats(server, movieChoice, showtimeChoice);
                 } else {
                     if (checkSeat(server, movieChoice, showtimeChoice, Integer.parseInt(userInput))) {
@@ -911,8 +912,8 @@ public class MovieTheater {
         ResultSet results = null;
         PreparedStatement ps = null;
         try {
-            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_IDWHERE Time =? AND Title =? AND User_ID = null");
-            ps.setString(1, showtime);
+            ps = server.prepareStatement("SELECT * FROM seat_showtime, film_showtime JOIN film ON film.Film_ID = film_showtime.Film_ID JOIN showtime ON showtime.Showtime_ID = film_showtime.Showtime_ID WHERE Time =? AND Title =? AND User_ID = null");
+            ps.setString(1, showtime+":00");
             ps.setString(2, movie);
             results = ps.executeQuery();
             System.out.println("The available seats for " + movie + " at " + showtime + " are:");

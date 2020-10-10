@@ -1283,13 +1283,11 @@ public class MovieTheater {
     }
 
     // insert user
-    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds,
-            Integer points) {
+    public static int insertUser(Connection s, Integer id, String first, String last, String bday, Integer funds, Integer points) {
         Statement stmt = null;
         int success = 0;
         try {
-            PreparedStatement ps = s.prepareStatement(
-                    "INSERT INTO user (User_ID, First_Name, Last_Name, Birthday, Funds, Reward_Points) VALUES (?,?,?,?,?,?)");
+            PreparedStatement ps = s.prepareStatement("INSERT INTO user (User_ID, First_Name, Last_Name, Birthday, Funds, Reward_Points) VALUES (?,?,?,?,?,?)");
             ps.setInt(1, id);
             ps.setString(2, first);
             ps.setString(3, last);
@@ -1359,10 +1357,9 @@ public class MovieTheater {
         PreparedStatement ps = null;
         int rowAffected = 0;
         try {
-            ps = s.prepareStatement("UPDATE user SET Reward_Points =? WHERE First_Name =? AND Last_Name=?");
-            ps.setInt(1, points);
-            ps.setString(2, first);
-            ps.setString(3, last);
+            ps = s.prepareStatement("UPDATE user SET Reward_Points = Reward_Points + 1 WHERE First_Name =? AND Last_Name=?");
+            ps.setString(1, first);
+            ps.setString(2, last);
             rowAffected = ps.executeUpdate();
 
         } catch (SQLException se) {
